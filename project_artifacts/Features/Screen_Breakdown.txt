@@ -1,0 +1,16 @@
+Screens 
+1. Login Screen
+2. Dashboard
+3. Containers
+4. Deployment
+
+Features:
+
+1. Creating Dashboard to see VM utilization and number of containers in the particular VM.
+2. Application Screen contains 
+	1. Form to take application data such as Application Name,Docker Registry Image Url, Cpu utilization in units, Memory Utilization units.
+	2. Redeploy Saved Application
+3. Deployment Screen will Display Detailed Metrics of every Containers Deployed Grouped by Application.
+	1. Option to undeploy container in any VM.	
+	2. Option to Redeploy a container in any VM.
+	
