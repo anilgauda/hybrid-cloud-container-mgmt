@@ -1,0 +1,94 @@
+FEATURE BREAKDOWN (DRAFT No. 1)
+-----------------------------------------------------------------------------------------------------------------------
+
+Authentication
+==
+
+Design register & login page, validate inputs, create user & validate user
+ - html/css of register page (VIEW)
+ - validation logic and route (CONTROLLER)
+ - writing model and DAO (MODEL)
+ - salt based hash creation (UTILITY) [MUST INCLUDE REFERENCE TO ALGORITHM USED FROM WEB]
+
+
+
+Authorization
+==
+
+NOTE: When a new user is registered, he is assigned an UNVERIFIED role. Only after the admin assigns a USER
+role can he access the website. The first time when this software is run, when there is no admin, the user must
+be able to create a ADMIN role user. After that registrations will only create UNVERIFIED users.
+
+Design page to list users and edit users
+ - can assign a user/admin role to a user in edit page
+ - permission access control list for every role (A table/enum defining what each role can do)
+ - A permission class must be written that checks whether the current user can do something or not
+    For eg.
+        User user = userService.get(userId);
+        User.can(CREATE_VM); // Must return true if the user is an admin else false
+ - list users can use bootstrap datatables to load all users at once and paginate client-side for simplicity
+
+
+An authorization system built on permissions instead of roles will help us to extend this system in the future.
+
+
+----->>>  SPLIT POINT <<<----- One person can do authentication and the other can do authorization
+
+
+Applications
+==
+
+Design an page to create application (as per ER model)
+ - Must validate if docker registry image is readable
+ - Edit existing application page
+ - List all applications
+ - Delete existing application (Only ADMIN)
+
+
+VMs & providers
+==
+
+Design page to add VM and provider (Only ADMIN)
+ - Must validate if VM can be accessed with given private key
+ - Edit existing VM / provider (Only ADMIN)
+ - List all VMs and providers
+ - Delete existing VMs or providers (Only ADMIN)
+
+
+
+----->>>  SPLIT POINT <<<----- One person can do applications and the other can do vms & providers
+
+
+Deployment
+==
+
+Before creating CRUD side, let us first create the backend libraries for this. This section will be split
+into two main libraries
+
+
+    -> First Library
+        1. Give a docker register url and a VM, it must first check if docker is installed
+            if not, install it (we may need to store OS of VM to run specific docker installation script).
+            For simplicity of this app, we can assume it will be Ubuntu and later if we have time let us make
+            this customizable.
+        2. It should then run docker command to deploy the image there
+        3. After that it should save the container id generated on run, back in our database so that
+            the next time when we need to undeploy we know which container we need to kill
+        4. Should be able to undeploy the containers
+        5. Must check and fail if necessary memory/cpu is not available.
+
+
+    -> Second Library
+        1. If VM is not given should be able to deploy the images based on avaialble cpu/memory in each VM
+        2. If spread option is given, should deploy containers in different VMs
+        3. Should upgrade docker application
+        4. Should parse/calculate runtime metrics of containers for showing them in our crud side
+
+
+----->>>  SPLIT POINT <<<----- Points may be swapped or moved if weight of libraries doesn't seem correct
+
+
+Dashboard
+==
+
+Let's skip this for now, only after we have the application ready we can show the relevant data.
