@@ -1,4 +1,4 @@
-package ie.ncirl.container.manager.utility.configurevm;
+package ie.ncirl.container.manager.library.configurevm;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,8 +9,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import ie.ncirl.container.manager.utility.configurevm.constants.VMConstants;
-import ie.ncirl.container.manager.utility.configurevm.exception.DockerInstallationException;
+import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
+import ie.ncirl.container.manager.library.configurevm.exception.DockerInstallationException;
 
 public class ConfigureVM {
 	@SuppressWarnings({ "unused", "static-access" })

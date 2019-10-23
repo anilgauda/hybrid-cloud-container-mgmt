@@ -1,4 +1,4 @@
-package ie.ncirl.container.manager.utility.configurevm.exception;
+package ie.ncirl.container.manager.library.configurevm.exception;
 
 public class DockerInstallationException extends Exception{
 	private static final long serialVersionUID = -6063941682640997197L;
