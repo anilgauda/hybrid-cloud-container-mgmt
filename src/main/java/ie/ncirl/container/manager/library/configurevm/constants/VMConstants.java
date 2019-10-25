@@ -16,8 +16,22 @@ public class VMConstants {
 
     /******** Install and configure Docker Commands for Fedora based OS *******************/
     public final static String FINSTALL_DOCKER_COMMAND = "sudo yum install docker-engine -y";
-
-
+/******** Get Docker containers based on image name processes  *******************/
+	//Right now it is hello-world
+	public final static String DOCKER_PROCESSES_COMMAND="sudo docker ps -aqf ancestor=hello-world";
+	
+	/***** Get Docker Status in the Linux environement ********/
+	public final static String DOCKER_VERSION="docker -v";
+	
+	/***** Get Docker Status in the Linux environement ********/
+	public final static String DOCKER_STATUS_COMMAND="sudo service docker status | grep Active";
+	
+	/**** List of docker containers running******/
+	public final static String DOCKER_LIST_CONTAINER="docker container ls -q";
+	
+	
+	public final static String DOCKER_CONTAINER_START="docker container run -d -p 8080:80 httpd:2.4";
+	public final static String DOCKER_CONTAINER_START1="docker container run -d -p 9090:80 httpd:latest";
     /******************************Exception Messages*************************************/
     public final static String DOCKER_INSTALL_FAILED_MSG = "Docker Installation Failed";
     public final static String DOCKER_START_FAILED_MSG = "Failed to Start Docker Service";
