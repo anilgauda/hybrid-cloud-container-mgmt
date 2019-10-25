@@ -1,4 +1,4 @@
-package ie.ncirl.container.manager.library.deployer.service;
+package ie.ncirl.container.manager.library.deployer.service.allocator;
 
 import ie.ncirl.container.manager.common.domain.Application;
 

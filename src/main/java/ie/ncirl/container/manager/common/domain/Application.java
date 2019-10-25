@@ -18,9 +18,11 @@ public class Application {
 
     private String registryImageUrl;
 
-    private Integer cpuMax;
+    @Builder.Default
+    private Integer cpuMax = 100;
 
-    private Integer memMax;
+    @Builder.Default
+    private Integer memMax = 100;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
