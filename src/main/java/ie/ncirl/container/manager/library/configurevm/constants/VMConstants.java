@@ -29,6 +29,11 @@ public class VMConstants {
 	/**** List of docker containers running******/
 	public final static String DOCKER_LIST_CONTAINER="docker container ls -q";
 	
+	/******** Get Vm stats*****/
+	public final static String VM_STATS="vmstat";
+	
+	/******************Get Containers Stats ******************/
+	public final static String CONTAINER_STATS="docker stats --no-stream";
 	
 	public final static String DOCKER_CONTAINER_START="docker container run -d -p 8080:80 httpd:2.4";
 	public final static String DOCKER_CONTAINER_START1="docker container run -d -p 9090:80 httpd:latest";

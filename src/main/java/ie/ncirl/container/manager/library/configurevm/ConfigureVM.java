@@ -4,6 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -128,10 +133,81 @@ public class ConfigureVM {
 		return containerIds;
 	}
 
+	public Map<String, Integer> getVMStats(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+		ArrayList<String> vmStats = new ArrayList<>();
+		try {
+			vmStats = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.VM_STATS);
+		} catch (JSchException | IOException e) {
+			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
+		}
+		System.out.println(vmStats.get(1));// Logger INFO
+		System.out.println(vmStats.get(2));// Logger INFO
+		String[] vmParameters = vmStats.get(1).split(" ");
+		String[] vmVal = vmStats.get(2).split(" ");
+
+		List<String> vmParametersFiltered = new ArrayList<>();
+		List<String> vmValFiltered = new ArrayList<>();
+
+		Map<String, Integer> vmStatsMap = new HashMap<>();
+		for (String val : vmParameters) {
+			if (StringUtils.isNotBlank(val)) {
+				vmParametersFiltered.add(val);
+			}
+		}
+		for (String val : vmVal) {
+			if (StringUtils.isNotBlank(val)) {
+				vmValFiltered.add(val);
+			}
+		}
+		System.out.println("Length of the keys array" + vmParametersFiltered.size()); // Logger INFO
+		System.out.println("Length of the val array" + vmValFiltered.size()); // Logger INFO
+		for (int i = 0; i < vmParametersFiltered.size(); i++) {
+			vmStatsMap.put(vmParametersFiltered.get(i), Integer.parseInt(vmValFiltered.get(i)));
+		}
+
+		vmStatsMap.forEach((k, v) -> System.out.println("Key :" + k + "  Value :" + v)); // Logger INFO
+		return vmStatsMap;
+	}
+
+	public Map<String, String> getContainerStats(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+		ArrayList<String> containerStats = new ArrayList<>();
+		try {
+			containerStats = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.CONTAINER_STATS);
+		} catch (JSchException | IOException e) {
+			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
+		}
+		System.out.println(containerStats.get(0));// Logger INFO
+		System.out.println(containerStats.get(1));// Logger INFO
+		String[] containerParam = containerStats.get(0).split("  ");
+		String[] containerVal = containerStats.get(1).split("  ");
+
+		List<String> containerParamFilt = new ArrayList<>();
+		List<String> containerValFilt = new ArrayList<>();
+		Map<String, String> containerStatsMap = new HashMap<>();
+		
+		for (String val : containerParam) {
+			if (StringUtils.isNotBlank(val)) {
+				containerParamFilt.add(val);
+			}
+		}
+		for (String val : containerVal) {
+			if (StringUtils.isNotBlank(val)) {
+				containerValFilt.add(val);
+			}
+		}
+		System.out.println("Length of the keys array" + containerParamFilt.size()); // Logger INFO
+		System.out.println("Length of the val array" + containerValFilt.size()); // Logger INFO
+		for (int i = 0; i < containerParamFilt.size(); i++) {
+			containerStatsMap.put(containerParamFilt.get(i), containerValFilt.get(i));
+		}
+
+		containerStatsMap.forEach((k, v) -> System.out.println("Key :" + k + "  Value :" + v)); // Logger INFO
+		return containerStatsMap;
+	}
+
 	public static void main(String args[]) throws DockerInstallationException, IOException, JSchException {
 		String linuxDis = null;
 		ConfigureVM config = new ConfigureVM();
-		config.getContainerIds("D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem", "ec2-user", "52.214.70.41");
-		config.checkForDocker("D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem", "ec2-user", "52.214.70.41");
+		config.getContainerStats("D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem", "ec2-user", "52.212.95.28");
 	}
 }
