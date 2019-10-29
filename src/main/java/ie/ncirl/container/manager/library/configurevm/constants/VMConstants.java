@@ -33,7 +33,7 @@ public class VMConstants {
 	public final static String VM_STATS="vmstat";
 	
 	/******************Get Containers Stats ******************/
-	public final static String CONTAINER_STATS="docker stats --no-stream";
+	public final static String CONTAINER_STATS="docker stats %s --no-stream";
 	
 	/***************Docker Container stop******************/
 	public final static String DOCKER_CONTAINER_STOP="docker container stop %s";
