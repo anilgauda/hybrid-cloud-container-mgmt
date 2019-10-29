@@ -123,6 +123,7 @@ public class ConfigureVM {
 		return isDockerServiceRunning;
 	}
 
+	/*************** Method to get List of containers Running in a vm***********************/
 	public ArrayList<String> getContainerIds(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
 		ArrayList<String> containerIds = new ArrayList<>();
 		try {
@@ -133,6 +134,7 @@ public class ConfigureVM {
 		return containerIds;
 	}
 
+	/*************** Method to get Map of virtual machine system properties ***********************/
 	public Map<String, Integer> getVMStats(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
 		ArrayList<String> vmStats = new ArrayList<>();
 		try {
@@ -169,10 +171,11 @@ public class ConfigureVM {
 		return vmStatsMap;
 	}
 
-	public Map<String, String> getContainerStats(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	/*************** Method to get Map of Container Stats properties ***********************/
+	public Map<String, String> getContainerStats(String privateKeyPath, String userName, String ipAddress,String containerID) throws DockerInstallationException {
 		ArrayList<String> containerStats = new ArrayList<>();
 		try {
-			containerStats = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.CONTAINER_STATS);
+			containerStats = executeCommand(privateKeyPath, userName, ipAddress, String.format(VMConstants.CONTAINER_STATS,containerID));
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -205,9 +208,29 @@ public class ConfigureVM {
 		return containerStatsMap;
 	}
 
+	public List<String> stopContainers(String privateKeyPath, String userName, String ipAddress,List<String> containerIds) throws DockerInstallationException {
+		String containerId= new String();
+		List<String> listOfContainersStopped=new ArrayList<>();
+		for(String container:containerIds) {
+			containerId+=" "+container;
+		}
+		System.out.println(String.format(VMConstants.DOCKER_CONTAINER_STOP,containerId)); //Logger INFO
+		try {
+			listOfContainersStopped=executeCommand(privateKeyPath, userName, ipAddress, String.format(VMConstants.DOCKER_CONTAINER_STOP,containerId));
+		} catch (JSchException | IOException e) {
+			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
+		}
+		return listOfContainersStopped;
+	}
+	
 	public static void main(String args[]) throws DockerInstallationException, IOException, JSchException {
 		String linuxDis = null;
 		ConfigureVM config = new ConfigureVM();
-		config.getContainerStats("D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem", "ec2-user", "52.212.95.28");
+		List<String> containerStopped=new ArrayList<>();
+		List<String> containerIds=new ArrayList<>();
+		containerIds.add("91b0db16e850");
+		containerIds.add("6eb77ddbf945");
+		containerStopped=config.stopContainers("D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem", "ec2-user", "34.252.148.15",containerIds);
+		containerStopped.forEach((s) -> System.out.println("Containers Stopped "+s));
 	}
 }

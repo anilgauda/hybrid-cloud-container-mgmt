@@ -35,6 +35,9 @@ public class VMConstants {
 	/******************Get Containers Stats ******************/
 	public final static String CONTAINER_STATS="docker stats --no-stream";
 	
+	/***************Docker Container stop******************/
+	public final static String DOCKER_CONTAINER_STOP="docker container stop %s";
+	
 	public final static String DOCKER_CONTAINER_START="docker container run -d -p 8080:80 httpd:2.4";
 	public final static String DOCKER_CONTAINER_START1="docker container run -d -p 9090:80 httpd:latest";
     /******************************Exception Messages*************************************/
