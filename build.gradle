@@ -24,7 +24,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	compileOnly 'org.projectlombok:lombok:1.18.4'
+	annotationProcessor("org.projectlombok:lombok")
+	compileOnly 'org.projectlombok:lombok:1.18.10'
 
 	compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 	compile 'org.webjars:jquery:3.4.1'

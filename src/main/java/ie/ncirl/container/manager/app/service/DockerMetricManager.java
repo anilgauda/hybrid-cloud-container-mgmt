@@ -1,4 +1,6 @@
-package ie.ncirl.container.manager.library.deployer.service.allocator;
+package ie.ncirl.container.manager.app.service;
+
+import ie.ncirl.container.manager.common.domain.Application;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +13,11 @@ public class DockerMetricManager {
 
     /**
      * Get the docker applications running in a VM
-     *  1. Get the container ids from a VM
-     *  2. Get the docker applications mapped to the container id in the database
-     * @param privateKey private key for VM
-     * @return
+     * @param containerIds container ids running in a VM
+     * @return List of Application
      */
-    public List<String> getDockerApplications(String privateKey) {
+    public List<Application> getDockerApplications(List<String> containerIds) {
+
 
         return new ArrayList<>();
     }
