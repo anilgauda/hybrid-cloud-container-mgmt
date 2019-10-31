@@ -38,8 +38,8 @@ public class VMConstants {
 	/***************Docker Container stop******************/
 	public final static String DOCKER_CONTAINER_STOP="docker container stop %s";
 	
-	public final static String DOCKER_CONTAINER_START="docker container run -d -p 8080:80 httpd:2.4";
-	public final static String DOCKER_CONTAINER_START1="docker container run -d -p 9090:80 httpd:latest";
+	/************** Docker Command to run docker in detacted mode*********/
+	public final static String DOCKER_CONTAINER_START="docker container run -d %s";
     /******************************Exception Messages*************************************/
     public final static String DOCKER_INSTALL_FAILED_MSG = "Docker Installation Failed";
     public final static String DOCKER_START_FAILED_MSG = "Failed to Start Docker Service";
