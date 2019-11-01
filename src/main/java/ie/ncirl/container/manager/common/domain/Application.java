@@ -18,11 +18,9 @@ public class Application {
 
     private String registryImageUrl;
 
-    @Builder.Default
-    private Integer cpuMax = 100;
+    private Integer cpu; // In % of total VM CPU predicted to be used.. This is used to optimize allocation
 
-    @Builder.Default
-    private Integer memMax = 100;
+    private Integer memory; // In MB of memory that app will use.. This is used in allocators
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;

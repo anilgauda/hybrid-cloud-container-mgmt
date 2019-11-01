@@ -1,6 +1,8 @@
 package ie.ncirl.container.manager.common.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -42,6 +44,11 @@ public class VM {
      */
     private String host;
 
+    /**
+     * This must be filled while creating the VM. This is the available memory when no
+     * allocations or deployments have been made.
+     */
+    private Integer memory; // In GB
 
     private LocalDateTime lastAccess;
     
@@ -53,4 +60,8 @@ public class VM {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Provider provider;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<ContainerDeployment> containerDeployments = new ArrayList<>();
 }
