@@ -1,12 +1,14 @@
 package ie.ncirl.container.manager.common.domain;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Builder
+@Getter
 public class ContainerDeployment {
 
     @Id

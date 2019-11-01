@@ -1,6 +1,7 @@
 package ie.ncirl.container.manager.common.domain;
 
 import lombok.Builder;
+import lombok.Getter;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,6 +10,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 @Builder
+@Getter
 public class Application {
 
     @Id
