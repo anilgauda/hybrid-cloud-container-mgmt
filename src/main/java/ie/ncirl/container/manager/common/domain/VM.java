@@ -1,17 +1,26 @@
 package ie.ncirl.container.manager.common.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@ToString
 @Entity
-@Builder
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "vms")
 public class VM {
 
@@ -35,6 +44,9 @@ public class VM {
 
 
     private LocalDateTime lastAccess;
+    
+    @Lob
+    private byte[] privateKey;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private User user;

@@ -21,6 +21,40 @@
 					<div class="d-sm-flex align-items-center justify-content-between mb-4">
 						<h1 class="h3 mb-0 text-gray-800">Running Application</h1>
 					</div>
+					<div class="row">
+						<!-- Collapsable Card Example -->
+						<div class="card shadow mb-4">
+							<!-- Card Header - Accordion -->
+							<a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
+								role="button" aria-expanded="true" aria-controls="collapseCardExample">
+								<h6 class="m-0 font-weight-bold text-primary">AWS</h6>
+							</a>
+							<!-- Card Content - Collapse -->
+							<div class="collapse show" id="collapseCardExample">
+								<div class="card-body">
+									<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+									<thead>
+									<tr>
+									<td><b>ContainerID's</b></td>
+									<td><b>Parameters</b></td></tr>
+									</thead>
+										<tr th:each="runningApp :${applications}">
+											
+											<td th:text="${runningApp.containerId}">123</td>
+											<td>
+											<ul>
+												<li th:each="stats: ${runningApp.containerStats}">
+												<span th:text="${stats.key}"></span> = <span
+													th:text="${stats.value}"></span></li>
+											</ul>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+						<!-- Collapsable Card Example End-->
+					</div>
 				</div>
 				<!-- /.container-fluid -->
 			</div>

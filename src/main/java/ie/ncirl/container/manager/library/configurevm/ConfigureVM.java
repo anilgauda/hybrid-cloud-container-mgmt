@@ -3,6 +3,9 @@ package ie.ncirl.container.manager.library.configurevm;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +23,13 @@ import ie.ncirl.container.manager.library.configurevm.exception.DockerInstallati
 
 public class ConfigureVM {
 	@SuppressWarnings({ "unused", "static-access" })
-	private ArrayList<String> executeCommand(String privateKeyPath, String userName, String ipAddress, String command) throws IOException, JSchException {
+	private ArrayList<String> executeCommand(byte[] privateKey, String userName, String ipAddress, String command) throws IOException, JSchException {
 		String line = null;
 		ArrayList<String> result = new ArrayList<>();
 		JSch javaShell = new JSch();
-		javaShell.addIdentity(privateKeyPath);
+		//javaShell.addIdentity(privateKeyPath);
+
+		javaShell.addIdentity("", privateKey, null, null);
 		javaShell.setConfig(VMConstants.HOST_KEY_CHECK_CONFIG, VMConstants.HOST_KEY_CHECK_CONFIG_VALUE);
 		Session session = javaShell.getSession(userName, ipAddress, VMConstants.SSH_PORT);
 		try {
@@ -58,10 +63,10 @@ public class ConfigureVM {
 		return result;
 	}
 
-	public ArrayList<String> getLinuxDistribution(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	public ArrayList<String> getLinuxDistribution( byte[] privateKey, String userName, String ipAddress) throws DockerInstallationException {
 		ArrayList<String> result = new ArrayList<>();
 		try {
-			result = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.LINUX_DISTRIBUTION);
+			result = executeCommand(privateKey, userName, ipAddress, VMConstants.LINUX_DISTRIBUTION);
 			if (result.contains(VMConstants.OS_FEDORA)) {
 				result.add(VMConstants.OS_FEDORA);
 			} else if (result.contains(VMConstants.OS_DEBIAN)) {
@@ -75,32 +80,32 @@ public class ConfigureVM {
 		return result;
 	}
 
-	public void installDocker(String privateKeyPath, String userName, String ipAddress, String linuxDist) throws DockerInstallationException {
+	public void installDocker(byte[] privateKey, String userName, String ipAddress, String linuxDist) throws DockerInstallationException {
 		try {
 			if (linuxDist.equalsIgnoreCase(VMConstants.OS_FEDORA)) {
-				executeCommand(privateKeyPath, userName, ipAddress, VMConstants.FINSTALL_DOCKER_COMMAND);
+				executeCommand(privateKey, userName, ipAddress, VMConstants.FINSTALL_DOCKER_COMMAND);
 			} else if (linuxDist.equalsIgnoreCase(VMConstants.OS_DEBIAN)) {
-				executeCommand(privateKeyPath, userName, ipAddress, VMConstants.DINSTALL_DOCKER_COMMAND);
+				executeCommand(privateKey, userName, ipAddress, VMConstants.DINSTALL_DOCKER_COMMAND);
 			}
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_INSTALL_FAILED_MSG, e);
 		}
 	}
 
-	public void startDockerService(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	public void startDockerService(byte[] privateKey, String userName, String ipAddress) throws DockerInstallationException {
 		try {
-			executeCommand(privateKeyPath, userName, ipAddress, VMConstants.START_DOCKER_SERVICE);
+			executeCommand(privateKey, userName, ipAddress, VMConstants.START_DOCKER_SERVICE);
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
 	}
 
-	public boolean checkForDocker(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	public boolean checkForDocker(byte[] privateKey, String userName, String ipAddress) throws DockerInstallationException {
 		// Check if docker is installed or not
 		ArrayList<String> result = null;
 		boolean isDockerInstalled = true;
 		try {
-			result = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.DOCKER_VERSION);
+			result = executeCommand(privateKey, userName, ipAddress, VMConstants.DOCKER_VERSION);
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -110,12 +115,12 @@ public class ConfigureVM {
 		return isDockerInstalled;
 	}
 
-	public boolean checkForDockerService(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	public boolean checkForDockerService(byte[] privateKey, String userName, String ipAddress) throws DockerInstallationException {
 		ArrayList<String> result = null;
 		boolean isDockerServiceRunning = true;
 		// check is docker service is up or not
 		try {
-			result = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.DOCKER_STATUS_COMMAND);
+			result = executeCommand(privateKey, userName, ipAddress, VMConstants.DOCKER_STATUS_COMMAND);
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -129,10 +134,10 @@ public class ConfigureVM {
 	/***************
 	 * Method to get List of containers Running in a vm
 	 ***********************/
-	public ArrayList<String> getContainerIds(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	public ArrayList<String> getContainerIds(byte[] privateKey, String userName, String ipAddress) throws DockerInstallationException {
 		ArrayList<String> containerIds = new ArrayList<>();
 		try {
-			containerIds = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.DOCKER_LIST_CONTAINER);
+			containerIds = executeCommand(privateKey, userName, ipAddress, VMConstants.DOCKER_LIST_CONTAINER);
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -142,10 +147,10 @@ public class ConfigureVM {
 	/***************
 	 * Method to get Map of virtual machine system properties
 	 ***********************/
-	public Map<String, Integer> getVMStats(String privateKeyPath, String userName, String ipAddress) throws DockerInstallationException {
+	public Map<String, Integer> getVMStats(byte[] privateKey, String userName, String ipAddress) throws DockerInstallationException {
 		ArrayList<String> vmStats = new ArrayList<>();
 		try {
-			vmStats = executeCommand(privateKeyPath, userName, ipAddress, VMConstants.VM_STATS);
+			vmStats = executeCommand(privateKey, userName, ipAddress, VMConstants.VM_STATS);
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -181,10 +186,10 @@ public class ConfigureVM {
 	/***************
 	 * Method to get Map of Container Stats properties
 	 ***********************/
-	public Map<String, String> getContainerStats(String privateKeyPath, String userName, String ipAddress, String containerID) throws DockerInstallationException {
+	public Map<String, String> getContainerStats(byte[] privateKey, String userName, String ipAddress, String containerID) throws DockerInstallationException {
 		ArrayList<String> containerStats = new ArrayList<>();
 		try {
-			containerStats = executeCommand(privateKeyPath, userName, ipAddress, String.format(VMConstants.CONTAINER_STATS, containerID));
+			containerStats = executeCommand(privateKey, userName, ipAddress, String.format(VMConstants.CONTAINER_STATS, containerID));
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -217,7 +222,7 @@ public class ConfigureVM {
 		return containerStatsMap;
 	}
 
-	public List<String> stopContainers(String privateKeyPath, String userName, String ipAddress, List<String> containerIds) throws DockerInstallationException {
+	public List<String> stopContainers(byte[] privateKey, String userName, String ipAddress, List<String> containerIds) throws DockerInstallationException {
 		String containerId = new String();
 		List<String> listOfContainersStopped = new ArrayList<>();
 		for (String container : containerIds) {
@@ -225,17 +230,17 @@ public class ConfigureVM {
 		}
 		System.out.println(String.format(VMConstants.DOCKER_CONTAINER_STOP, containerId)); // Logger INFO
 		try {
-			listOfContainersStopped = executeCommand(privateKeyPath, userName, ipAddress, String.format(VMConstants.DOCKER_CONTAINER_STOP, containerId));
+			listOfContainersStopped = executeCommand(privateKey, userName, ipAddress, String.format(VMConstants.DOCKER_CONTAINER_STOP, containerId));
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
 		return listOfContainersStopped;
 	}
 
-	public List<String> startContainers(String privateKeyPath, String userName, String ipAddress, String repoPath) throws DockerInstallationException {
+	public List<String> startContainers(byte[] privateKey, String userName, String ipAddress, String repoPath) throws DockerInstallationException {
 		List<String> containerIds = new ArrayList<>();
 		try {
-			containerIds = executeCommand(privateKeyPath, userName, ipAddress, String.format(VMConstants.DOCKER_CONTAINER_START, repoPath));
+			containerIds = executeCommand(privateKey, userName, ipAddress, String.format(VMConstants.DOCKER_CONTAINER_START, repoPath));
 		} catch (JSchException | IOException e) {
 			throw new DockerInstallationException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
@@ -249,18 +254,23 @@ public class ConfigureVM {
 		return containerIds;
 	}
 
-	/*public static void main(String args[]) throws DockerInstallationException, IOException, JSchException {
+	public static void main(String args[]) throws DockerInstallationException, IOException, JSchException {
 		String keyPath = "D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem";
 		String vmUser = "ec2-user";
-		String publicIp = "54.229.210.125";
+		String publicIp = "54.154.27.111";
 		String repoPath = "anil2993/tomcat";
+		Path pkey=Paths.get(keyPath);
+		byte[] prvKey=Files.readAllBytes(pkey);
 		ConfigureVM config = new ConfigureVM();
 		ArrayList<String> containerIDs=null;
 		
 		  String linuxDist =
-		  config.getLinuxDistribution(keyPath,vmUser,publicIp).get(0);
-		 System.out.println("Current Linux Dist is :" + linuxDist); boolean
-		  isDockerInstalled=config.checkForDocker(keyPath, vmUser, publicIp); boolean
+		  config.getLinuxDistribution(prvKey,vmUser,publicIp).get(0);
+		  System.out.println(prvKey.toString());
+		 System.out.println("Current Linux Dist is :" + linuxDist); 
+		 
+		 /*boolean
+		 isDockerInstalled=config.checkForDocker(keyPath, vmUser, publicIp); boolean
 		  isDockerStarted=config.checkForDockerService(keyPath, vmUser, publicIp);
 		  if(!isDockerInstalled) { config.installDocker(keyPath, vmUser, publicIp,
 		  linuxDist); } if(!isDockerStarted) { config.startDockerService(keyPath,
@@ -268,6 +278,6 @@ public class ConfigureVM {
 		
 		config.startContainers(keyPath, vmUser, publicIp, repoPath);
 		containerIDs=config.getContainerIds(keyPath, vmUser, publicIp);
-		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));
-	}*/
+		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));*/
+	}
 }
