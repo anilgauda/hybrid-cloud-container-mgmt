@@ -1,5 +1,6 @@
 package ie.ncirl.container.manager.common.domain;
 
+import ie.ncirl.container.manager.common.domain.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 public class User {
 
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
@@ -30,6 +31,7 @@ public class User {
 
     private String avatar;
 
-    //@OneToOne(fetch = FetchType.LAZY, optional = false)
-    //private Role role;
+    @Builder.Default
+    @Column
+    Role role = Role.USER;
 }

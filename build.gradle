@@ -35,7 +35,7 @@ dependencies {
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 
-    //compile('org.flywaydb:flyway-core')
+    compile('org.flywaydb:flyway-core')
     implementation('org.postgresql:postgresql')
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

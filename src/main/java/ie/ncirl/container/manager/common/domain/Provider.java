@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Cloud providers like AWS, Azure, etc
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 @Entity
 @Builder
 @Getter
+@Table(name = "providers")
 public class Provider {
 
     @Id

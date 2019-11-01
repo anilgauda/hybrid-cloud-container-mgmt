@@ -4,10 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
@@ -15,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @Setter
+@Table(name = "vms")
 public class VM {
 
     @Id

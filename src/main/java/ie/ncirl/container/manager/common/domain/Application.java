@@ -3,14 +3,12 @@ package ie.ncirl.container.manager.common.domain;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Builder
 @Getter
+@Table(name = "applications")
 public class Application {
 
     @Id

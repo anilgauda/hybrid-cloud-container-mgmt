@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Getter
+@Table(name = "container_deployments")
 public class ContainerDeployment {
 
     @Id
