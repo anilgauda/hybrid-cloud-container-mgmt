@@ -11,7 +11,7 @@ import java.util.List;
 @Slf4j
 public class DockerManagerUtil {
 
-    public static List<String> getContainerIdsInVm(VM vm) {
+    /*public static List<String> getContainerIdsInVm(VM vm) {
         //vm = VM.builder().host("localhost").build(); // TODO: Test ?
 
         ConfigureVM config = new ConfigureVM();
@@ -23,5 +23,5 @@ public class DockerManagerUtil {
         }
 
         return containerIds;
-    }
+    }*/
 }

@@ -1,36 +1,15 @@
 package ie.ncirl.container.manager.app.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Map;
 
+@ToString
+@Getter
+@Setter
 public class Application {
-	private String containerId;
-	private Map<String, String> containerStats;
-
-	public String getContainerId() {
-		return containerId;
-	}
-
-	public void setContainerId(String containerId) {
-		this.containerId = containerId;
-	}
-
-	public Map<String, String> getContainerStats() {
-		return containerStats;
-	}
-
-	public void setContainerStats(Map<String, String> containerStats) {
-		this.containerStats = containerStats;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Application [containerId=");
-		builder.append(containerId);
-		builder.append(", containerStats=");
-		builder.append(containerStats);
-		builder.append("]");
-		return builder.toString();
-	}
-
+    private String containerId;
+    private Map<String, String> containerStats;
 }
