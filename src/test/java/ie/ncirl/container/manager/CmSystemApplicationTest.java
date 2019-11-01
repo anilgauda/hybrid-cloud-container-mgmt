@@ -1,16 +1,18 @@
-package com.containermanagemnt.CMSystem;
+package ie.ncirl.container.manager;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.junit.Assert.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class CmSystemApplicationTest {
 
-	@Test
-	public void contextLoads() {
-	}
+    @Test
+    public void contextLoads() {
+    }
 
 }

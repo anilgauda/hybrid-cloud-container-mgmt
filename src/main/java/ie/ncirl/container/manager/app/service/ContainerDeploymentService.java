@@ -9,7 +9,7 @@ import java.util.List;
  * This class monitors all dockers in a given VM and returns required metrics like different dockers
  * running in the VM and the amount of resources used by each docker in the given VM
  */
-public class DockerMetricManager {
+public class ContainerDeploymentService {
 
     /**
      * Get the docker applications running in a VM

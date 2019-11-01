@@ -2,15 +2,14 @@ package ie.ncirl.container.manager.library.deployer.service.allocator;
 
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.VM;
-import ie.ncirl.container.manager.library.deployer.dto.Allocation;
+import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Strategy -> Non-Sticky => Same type of docker avoid
  * Strategy -> Optimize => Optimize memory & cpu
- * Strategy -> Fill => FIFO
+ * Strategy -> Fill => FIFO based on memory
  */
 
 public interface AppAllocator {
@@ -20,6 +19,7 @@ public interface AppAllocator {
      * @param application The docker app
      * @param numDeployments How many dockers must be deployed ?
      * @param vms he decrypted server private keys where these images can be deployed into
+     * @return allocation data
      */
-    public List<Allocation> getAllocations(Application application, Integer numDeployments, List<VM> vms);
+    public AllocationData getAllocationData(Application application, Integer numDeployments, List<VM> vms);
 }
