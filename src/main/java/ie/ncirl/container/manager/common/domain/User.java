@@ -1,15 +1,22 @@
 package ie.ncirl.container.manager.common.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Builder
-@Table(name="\"User\"")
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
 public class User {
 
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Id
     private Long id;
 
@@ -23,6 +30,6 @@ public class User {
 
     private String avatar;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    private Role role;
+    //@OneToOne(fetch = FetchType.LAZY, optional = false)
+    //private Role role;
 }
