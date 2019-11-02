@@ -18,4 +18,12 @@ public class ProviderService {
     public List<Provider> getAllProviders() {
         return providerRepo.findAll();
     }
+
+    public Provider findByName(String name) {
+        return providerRepo.findByName(name);
+    }
+
+    public void save(Provider provider) {
+        providerRepo.save(provider);
+    }
 }

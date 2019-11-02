@@ -1,13 +1,10 @@
 package ie.ncirl.container.manager.common.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Cloud providers like AWS, Azure, etc
@@ -15,13 +12,18 @@ import javax.persistence.Table;
 @Entity
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Table(name = "providers")
 public class Provider {
 
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
     private Long id;
 
+    @NotNull
+    @Size(min=2, max=255)
     private String name;
 }
