@@ -28,3 +28,19 @@ TODO
 
  - Add container_id in container_deployments er diagram
  - Add extra fields from VM.java
+ 
+ 
+ -->> Security features
+ 
+  - JSR 303 validations
+  - Custom form validations
+  - HTML5 validations
+  - CSRF protection with spring security
+  - SQL injection protection with JPA / ORM
+  - Role based authorization to resources
+  - Route protection with spring security
+  - Authentication with spring security
+  - Encryption of private keys
+ 
+ 
+ -->> Bes 

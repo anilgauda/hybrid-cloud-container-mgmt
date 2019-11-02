@@ -13,6 +13,7 @@ import java.util.List;
 public class ProviderService {
 
     @Autowired
+    private
     ProviderRepo providerRepo;
 
     public List<Provider> getAllProviders() {
