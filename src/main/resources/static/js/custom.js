@@ -1,11 +1,6 @@
-function setNavActive(elementId) {
-	$('ul li').each(function(i, k) {
-		if ($(k).hasClass("active")) {
-			fetchedId=$(k).attr('id');
-			if (!(typeof fetchedId == "undefined")&&(elementId != fetchedId)) {
-				$("#"+fetchedId).removeClass("active");
-				$("#"+elementId).addClass("active");
-			}
-		}
-	});
-}
+$(document).ready(function () {
+    var url = window.location;
+   $('#accordionSidebar a.nav-link').filter(function() {
+         return this.href == url;
+    }).parent().addClass('active');
+});
