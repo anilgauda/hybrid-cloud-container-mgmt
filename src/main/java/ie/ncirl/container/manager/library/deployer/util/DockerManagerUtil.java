@@ -1,8 +1,8 @@
 package ie.ncirl.container.manager.library.deployer.util;
 
 import ie.ncirl.container.manager.common.domain.VM;
-import ie.ncirl.container.manager.library.configurevm.ConfigureVM;
-import ie.ncirl.container.manager.library.configurevm.exception.DockerInstallationException;
+import ie.ncirl.container.manager.library.configurevm.VMConfig;
+import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;

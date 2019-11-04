@@ -43,5 +43,8 @@ public class VMConstants {
     /******************************Exception Messages*************************************/
     public final static String DOCKER_INSTALL_FAILED_MSG = "Docker Installation Failed";
     public final static String DOCKER_START_FAILED_MSG = "Failed to Start Docker Service";
+    public final static String DOCKER_MISSING_MSG = "Docker is not Installed";
+    public final static String DOCKER_SERVICE_NOT_RUNNING_MSG = "Docker Service is not running in VM";
+
 
 }
