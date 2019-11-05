@@ -17,4 +17,16 @@ $(document).ready(function () {
     if (!setNavActive(url) && localStorage.getItem("lastVisitedUrl") != null) {
         setNavActive(localStorage.getItem("lastVisitedUrl"));
     }
+
+    $('button[name="delete"]').on('click', function(e) {
+      var $form = $(this).closest('form');
+      e.preventDefault();
+      $('#confirm').modal({
+          backdrop: 'static',
+          keyboard: false
+      })
+      .on('click', '#delete', function(e) {
+          $form.trigger('submit');
+        });
+    });
 });

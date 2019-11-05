@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::section})}">
+
+<section class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Providers > Edit</h1>
+    </div>
+    <div class="card shadow mb-4 col-lg-6" style="padding: 10px">
+        <div class="row col-lg-12">
+            <!-- Card Header - Accordion -->
+            <div id="provider_list" class="d-block card-header py-3 top-buffer" role="button" aria-expanded="true"
+                 aria-controls="collapseCardExample">
+                <h6 class="m-0 font-weight-bold text-primary">Editing Provider</h6>
+            </div>
+
+            <form action="#" th:action="@{/provider/edit}" th:object="${provider}"
+                  method="post" style="padding: 10px">
+                <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                    <span th:errors="*{name}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="name">Provider name</label>
+                    <input type="hidden" th:field="*{id}">
+                    <input type="text" class="form-control" id="name" aria-describedby="nameHelp"
+                           placeholder="Enter provider name" required th:field="*{name}">
+                    <small id="nameHelp" class="form-text text-muted">Your servers/machines created will be grouped
+                        under providers.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Edit</button>
+                <a href="/providers/view" id="cancel" name="cancel" class="btn btn-light">Back</a>
+            </form>
+        </div>
+    </div>
+
+
+</section>
+
+</html>

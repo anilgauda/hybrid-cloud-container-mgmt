@@ -1,2 +1,2 @@
 ALTER TABLE public.vms
-ADD COLUMN memory bigint; 
+ADD COLUMN memory bigint;

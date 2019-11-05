@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @ToString
 @Table(name = "providers")
 public class Provider {

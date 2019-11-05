@@ -20,8 +20,16 @@ public class ProviderService {
         return providerRepo.findAll();
     }
 
+    public Provider findById(Long id) {
+        return providerRepo.getOne(id);
+    }
+
     public Provider findByName(String name) {
         return providerRepo.findByName(name);
+    }
+
+    public void delete(Long id) {
+        providerRepo.deleteById(id);
     }
 
     public void save(Provider provider) {

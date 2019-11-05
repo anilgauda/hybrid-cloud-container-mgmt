@@ -16,7 +16,7 @@
         <div class="row col-lg-12">
             <!-- Card Header - Accordion -->
             <div id="provider_list" class="d-block card-header py-3 top-buffer" role="button" aria-expanded="true"
-                  aria-controls="collapseCardExample">
+                 aria-controls="collapseCardExample">
                 <h6 class="m-0 font-weight-bold text-primary">Provider list</h6>
             </div>
 
@@ -31,8 +31,14 @@
 
                     <td th:text="${provider.name}">Name</td>
                     <td>
-                        <button class="btn btn-success"><i class="fa fa-edit"></i> Edit</button>
-                        <button class="btn btn-danger"><i class="fa fa-trash"></i> Delete</button>
+                        <a th:href="@{|/provider/${provider.id}/edit|}" class="btn btn-success"><i
+                                class="fa fa-edit"></i> Edit</a>
+                        <form style="display: inline" action="#" th:action="@{|/provider/${provider.id}/delete|}"
+                              method="POST">
+                            <button class='btn btn-danger' type="submit" name="delete" value="delete">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 </thead>
@@ -41,6 +47,20 @@
         </div>
     </div>
 
+
+    <div class="modal fade" id="confirm" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Are you sure?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 </html>

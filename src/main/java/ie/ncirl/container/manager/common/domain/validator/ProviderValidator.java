@@ -23,7 +23,8 @@ public class ProviderValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         Provider provider = (Provider) target;
-        if (providerService.findByName(provider.getName()) != null) {
+        Provider existingProvider = providerService.findByName(provider.getName());
+        if (existingProvider != null && !existingProvider.equals(provider)) {
             errors.rejectValue("name", "not.unique", "Provider with same name already exists");
         }
     }
