@@ -6,11 +6,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @ToString
 @Entity
@@ -18,6 +14,7 @@ import lombok.ToString;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Table(name = "vms")
 public class VM {
 
@@ -25,9 +22,9 @@ public class VM {
     private Long id;
 
     /**
-     * The private key file (pem file) which will be used to ssh into the server
+     * Name to easily identify the VM
      */
-    private String keyFileName;
+    private String name;
 
     /**
      * The user with which to login into the VM

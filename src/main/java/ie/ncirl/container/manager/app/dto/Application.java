@@ -9,7 +9,7 @@ import java.util.Map;
 @ToString
 @Getter
 @Setter
-public class Application {
+public class Application implements DTO{
     private String containerId;
     private Map<String, String> containerStats;
 }

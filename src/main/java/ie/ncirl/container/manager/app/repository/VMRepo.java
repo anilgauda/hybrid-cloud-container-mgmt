@@ -7,4 +7,6 @@ import ie.ncirl.container.manager.common.domain.VM;
 
 @Repository
 public interface VMRepo extends JpaRepository<VM, Long>{
+
+    public VM findByName(String name);
 }
