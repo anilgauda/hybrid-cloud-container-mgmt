@@ -33,7 +33,7 @@ public class FillAppAllocatorTest {
     public void testShouldAllocateAppInVM() {
         int numDeployments = 2;
 
-        AppAllocator allocator = new FillAppAllocator();
+        AppAllocatorStrategy allocator = new FillAppAllocator();
         List<Allocation> actualAllocations = allocator.getAllocationData(app, numDeployments, vms).getAllocations();
 
         List<Allocation> expectedAllocations = new ArrayList<>();
@@ -46,7 +46,7 @@ public class FillAppAllocatorTest {
     public void testShouldAllocateTwoInFirstAndOneInSecondVM() {
         int numDeployments = 3;
 
-        AppAllocator allocator = new FillAppAllocator();
+        AppAllocatorStrategy allocator = new FillAppAllocator();
         List<Allocation> actualAllocations = allocator.getAllocationData(app, numDeployments, vms).getAllocations();
 
         List<Allocation> expectedAllocations = new ArrayList<>();
@@ -60,8 +60,10 @@ public class FillAppAllocatorTest {
     public void testShouldHaveFailedAllocations() {
         int numDeployments = 5;
 
-        AppAllocator allocator = new FillAppAllocator();
-        Integer failedAllocations = allocator.getAllocationData(app, numDeployments, vms).getFailedAllocations();
+        AppAllocator allocator = new AppAllocator();
+        AppAllocatorStrategy fillStrategy = new FillAppAllocator();
+        allocator.setAppAllocatorStrategy(fillStrategy);
+        Integer failedAllocations = allocator.getAllocations(app, numDeployments, vms).getFailedAllocations();
 
         assertThat(failedAllocations, greaterThan(0));
     }

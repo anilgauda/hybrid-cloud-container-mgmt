@@ -9,7 +9,7 @@ import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FillAppAllocator implements AppAllocator {
+public class FillAppAllocator implements AppAllocatorStrategy {
     @Override
     public AllocationData getAllocationData(Application application, Integer numDeployments, List<VM> vms) {
         List<Allocation> allocations = new ArrayList<>();

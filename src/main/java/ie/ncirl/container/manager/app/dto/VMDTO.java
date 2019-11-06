@@ -16,4 +16,6 @@ public class VMDTO implements DTO {
     private byte[] privateKey;
     private String username;
     private String host;
+
+    private Long providerId;
 }

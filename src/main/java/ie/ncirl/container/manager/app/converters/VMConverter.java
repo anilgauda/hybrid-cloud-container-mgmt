@@ -8,11 +8,13 @@ import org.springframework.stereotype.Component;
 public class VMConverter implements Converter<VMDTO, VM> {
     @Override
     public VMDTO from(VM vm) {
-        return VMDTO.builder().id(vm.getId()).name(vm.getName()).build();
+        return VMDTO.builder().id(vm.getId()).name(vm.getName()).username(vm.getUsername())
+                .host(vm.getHost()).privateKey(vm.getPrivateKey()).build();
     }
 
     @Override
-    public VM from(VMDTO domain) {
-        return null;
+    public VM from(VMDTO vmDTO) {
+        return VM.builder().id(vmDTO.getId()).name(vmDTO.getName()).username(vmDTO.getUsername())
+                .host(vmDTO.getHost()).privateKey(vmDTO.getPrivateKey()).build();
     }
 }

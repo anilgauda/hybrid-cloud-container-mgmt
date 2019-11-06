@@ -11,6 +11,7 @@ import lombok.*;
 @ToString
 @Entity
 @Getter
+@Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +19,7 @@ import lombok.*;
 @Table(name = "vms")
 public class VM {
 
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
     private Long id;
 

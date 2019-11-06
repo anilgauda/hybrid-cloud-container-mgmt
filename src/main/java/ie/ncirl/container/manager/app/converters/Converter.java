@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Every DTO <-> Model converter must implement this interface.
  * It follows the Converter pattern.
- *  Ref: https://bulldogjob.com/articles/287-converter-pattern-in-java-8
+ * Ref: https://bulldogjob.com/articles/287-converter-pattern-in-java-8
  *
  * Every DTO class must implement the interface DTO for supporting the conversion
  * @param <D>
