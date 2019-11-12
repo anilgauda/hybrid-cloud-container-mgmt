@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.jcraft.jsch.JSchException;
 
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
-import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 
 public class VMConfig {

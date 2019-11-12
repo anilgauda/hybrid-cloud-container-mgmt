@@ -8,11 +8,12 @@
     </div>
     <div class="row">
         <!-- Collapsable Card Example -->
-        <div class="card shadow mb-4">
+        
+        <div class="card shadow mb-4" th:each="runningApp :${applications}">
             <!-- Card Header - Accordion -->
             <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse"
                role="button" aria-expanded="true" aria-controls="collapseCardExample">
-                <h6 class="m-0 font-weight-bold text-primary">AWS</h6>
+                <h6 class="m-0 font-weight-bold text-primary" th:text="${runningApp.providerName}">AWS</h6>
             </a>
             <!-- Card Content - Collapse -->
             <div class="collapse show" id="collapseCardExample">
@@ -24,12 +25,11 @@
                             <td><b>Parameters</b></td>
                         </tr>
                         </thead>
-                        <tr th:each="runningApp :${applications}">
-
-                            <td th:text="${runningApp.containerId}">123</td>
+                        <tr th:each="container :${runningApp.containers}">
+                            <td th:text="${container.containerId}">123</td>
                             <td>
                                 <ul>
-                                    <li th:each="stats: ${runningApp.containerStats}">
+                                    <li th:each="stats: ${container.containerStats}">
                                         <span th:text="${stats.key}"></span> = <span
                                             th:text="${stats.value}"></span></li>
                                 </ul>
