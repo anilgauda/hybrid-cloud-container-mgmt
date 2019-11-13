@@ -39,7 +39,10 @@ public class VMService {
     }
 
     public VMDTO findById(Long id) {
-        return converter.from(vmRepo.getOne(id));
+        VM vm = vmRepo.getOne(id);
+        VMDTO vmdto = converter.from(vmRepo.getOne(id));
+        vmdto.setProviderId(vm.getProvider().getId());
+        return vmdto;
     }
 
     public void save(VMDTO vmDTO) {
@@ -52,4 +55,14 @@ public class VMService {
     public void delete(Long id) {
         vmRepo.deleteById(id);
     }
+
+    /**
+     * Gets the current available memory in a VM
+     * @param vm VM/server
+     * @return memory in integer
+     */
+    public Integer getAvailableMemory(VM vm) {
+        return 0;
+    }
+
 }

@@ -9,13 +9,13 @@ import javax.persistence.*;
 import lombok.*;
 
 @ToString
-@Entity
 @Getter
 @Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Entity(name = "vms")
 @Table(name = "vms")
 public class VM {
 
@@ -29,25 +29,19 @@ public class VM {
     private String name;
 
     /**
-     * The user with which to login into the VM
-     */
-    private String username;
-
-    /**
      * Can be domain or ip of the server/VM
      */
     private String host;
 
     /**
-     * This must be filled while creating the VM. This is the available memory when no
-     * allocations or deployments have been made.
+     * The user with which to login into the VM
      */
-    private Integer memory; // In GB
+    private String username;
+
+
+    private byte[] privateKey;
 
     private LocalDateTime lastAccess;
-    
-    @Lob
-    private byte[] privateKey;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
@@ -55,7 +49,7 @@ public class VM {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private Provider provider;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "vm")
     @Builder.Default
     private List<ContainerDeployment> containerDeployments = new ArrayList<>();
 }

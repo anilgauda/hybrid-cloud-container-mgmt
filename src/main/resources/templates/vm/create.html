@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::section})}">
+
+<section class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Servers > Create</h1>
+    </div>
+    <div class="card shadow mb-4 col-lg-6" style="padding: 10px">
+        <div class="row col-lg-12">
+            <!-- Card Header - Accordion -->
+            <div id="server_list" class="d-block card-header py-3 top-buffer" role="button" aria-expanded="true"
+                 aria-controls="collapseCardExample">
+                <h6 class="m-0 font-weight-bold text-primary">New Server</h6>
+            </div>
+
+            <form class="col-lg-12" action="#" th:action="@{/vm}" th:object="${vm}"
+                  method="post" style="padding: 10px">
+                <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                    <div th:errors="*{providerId}"></div>
+                    <div th:errors="*{name}"></div>
+                    <div th:errors="*{privateKey}"></div>
+                </div>
+                <div class="form-group">
+                    <label for="provider">Provider</label>
+                    <select class="form-control" required="required"
+                            th:value="${vm.providerId}" name="providerId" id="provider">
+                        <option disabled="disabled" selected="selected"> --
+                            Select a provider --
+                        </option>
+                        <option th:each="provider : ${availableProviders}" th:value="${provider.id}"
+                                th:text="${provider.name}" th:selected="${provider.id == vm.providerId}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Server name</label>
+                    <input type="text" class="form-control" id="name"
+                           placeholder="Enter server name" required th:field="*{name}">
+                </div>
+
+                <div class="form-group">
+                    <label for="host">Server host/ip address</label>
+                    <input type="text" class="form-control" id="host"
+                           placeholder="Enter host/ip address" required th:field="*{host}">
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Server username</label>
+                    <input type="text" class="form-control" id="username"
+                           placeholder="Enter username for accessing the server" required th:field="*{username}">
+                </div>
+
+                <div class="form-group">
+                    <label for="privateKey">Server private key</label>
+                    <textarea class="form-control" id="privateKey"
+                              placeholder="Enter private key for accessing the server" required
+                              th:field="*{privateKey}"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a href="/vms/view" id="cancel" name="cancel" class="btn btn-light">Back</a>
+            </form>
+        </div>
+    </div>
+
+
+</section>
+
+</html>

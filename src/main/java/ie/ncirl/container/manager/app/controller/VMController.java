@@ -1,6 +1,7 @@
 package ie.ncirl.container.manager.app.controller;
 
 import ie.ncirl.container.manager.app.dto.VMDTO;
+import ie.ncirl.container.manager.app.service.ProviderService;
 import ie.ncirl.container.manager.app.service.VMService;
 import ie.ncirl.container.manager.common.domain.validator.VMValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -29,30 +30,34 @@ public class VMController {
     private
     VMValidator vmValidator;
 
+    @Autowired
+    private
+    ProviderService providerService;
+
     @GetMapping(value = "/vms/view")
     public String showListPage(Model model) {
         model.addAttribute("vms", vmService.getAllVMs());
         return "vm/view.html";
     }
 
-    @GetMapping(value = "/vms/create")
+    @GetMapping(value = "/vm/create")
     public String showCreatePage(Model model) {
         model.addAttribute("vm", new VMDTO());
-        return "vm/create.html";
+        return renderCreatePage(model);
     }
 
     @GetMapping(value = "/vm/{id}/edit")
     public String showEditPage(Model model, @PathVariable("id") String id) {
-        model.addAttribute("vm", vmService.findById(Long.valueOf(id)));
-        return "vm/edit.html";
+        return renderEditPage(model, vmService.findById(Long.valueOf(id)));
     }
 
     @PostMapping(value = "/vm")
-    public String create(@Valid @ModelAttribute VMDTO vmDto, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String create(@Valid @ModelAttribute("vm") VMDTO vmDto, BindingResult result,
+                         RedirectAttributes redirectAttributes, Model model) {
         log.info(String.format("Creating VM %s", vmDto));
         vmValidator.validate(vmDto, result);
         if (result.hasErrors()) {
-            return "/vm/create";
+            return renderCreatePage(model);
         }
 
         vmService.save(vmDto);
@@ -61,11 +66,12 @@ public class VMController {
     }
 
     @PostMapping(value = "/vm/edit")
-    public String edit(@Valid @ModelAttribute VMDTO vmDto, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String edit(@Valid @ModelAttribute("vmDto") VMDTO vmDto, BindingResult result,
+                       RedirectAttributes redirectAttributes, Model model) {
         log.info(String.format("Editing vm %s", vmDto));
         vmValidator.validate(vmDto, result);
         if (result.hasErrors()) {
-            return "/vm/edit";
+            return renderEditPage(model, vmDto);
         }
 
         vmService.save(vmDto);
@@ -80,4 +86,28 @@ public class VMController {
         vmService.delete(Long.valueOf(id));
         return "redirect:/vms/view";
     }
+
+    /**
+     * Renders create page with any required dependent data
+     *
+     * @param model Spring model attributes used in thymeleaf
+     * @return the view page
+     */
+    private String renderCreatePage(Model model) {
+        model.addAttribute("availableProviders", providerService.getAllProviders());
+        return "/vm/create";
+    }
+
+    /**
+     * Renders edit page with any required dependent data
+     *
+     * @param model Spring model attributes used in thymeleaf
+     * @return the view page
+     */
+    private String renderEditPage(Model model, VMDTO vmdto) {
+        model.addAttribute("vmDto", vmdto);
+        model.addAttribute("availableProviders", providerService.getAllProviders());
+        return "/vm/edit";
+    }
+
 }

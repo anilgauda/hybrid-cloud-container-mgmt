@@ -1,21 +1,37 @@
 package ie.ncirl.container.manager.app.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.NotNull;
 
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class VMDTO implements DTO {
+
     private Long id;
+
+    @NotNull(message = "Name cannot be blank")
     private String name;
 
-    private byte[] privateKey;
-    private String username;
+    @NotNull(message = "Please enter host")
     private String host;
 
+    @NotNull
+    private String username;
+
+    @NotNull
+    @ToString.Exclude
+    private String privateKey;
+
+    /**
+     * Only used by allocator
+     */
+    private Integer availableMemory;
+
+    @NotNull(message = "Please select a provider")
     private Long providerId;
 }

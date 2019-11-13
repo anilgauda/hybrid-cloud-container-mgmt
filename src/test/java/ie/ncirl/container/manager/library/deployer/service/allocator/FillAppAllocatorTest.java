@@ -1,5 +1,6 @@
 package ie.ncirl.container.manager.library.deployer.service.allocator;
 
+import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
@@ -17,9 +18,9 @@ public class FillAppAllocatorTest {
 
     private int GB = 1000; // In MB
 
-    private List<VM> vms = new ArrayList<>();
-    private VM aws = VM.builder().id(1L).host("aws.com").memory(GB).build();
-    private VM azure = VM.builder().id(2L).host("azure.com").memory(GB).build();
+    private List<VMDTO> vms = new ArrayList<>();
+    private VMDTO aws = VMDTO.builder().id(1L).host("aws.com").availableMemory(GB).build();
+    private VMDTO azure = VMDTO.builder().id(2L).host("azure.com").availableMemory(GB).build();
 
     private Application app = Application.builder().name("app1").registryImageUrl("reg1").memory(500).build();
 

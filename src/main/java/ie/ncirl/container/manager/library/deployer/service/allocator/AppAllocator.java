@@ -1,7 +1,7 @@
 package ie.ncirl.container.manager.library.deployer.service.allocator;
 
+import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.common.domain.Application;
-import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class AppAllocator {
         this.strategy = strategy;
     }
 
-    public AllocationData getAllocations(Application application, Integer numDeployments, List<VM> vms) {
+    public AllocationData getAllocations(Application application, Integer numDeployments, List<VMDTO> vms) {
         return strategy.getAllocationData(application, numDeployments, vms);
     }
 }

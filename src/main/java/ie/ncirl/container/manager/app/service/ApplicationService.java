@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ie.ncirl.container.manager.app.util.KeyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class ApplicationService {
 			app.setProviderName(providerService.getAllProviders().get(0).getName()); // Should be Multiple Providers
 			ArrayList<String> linuxContainers = new ArrayList<>();
 			try {
-				linuxContainers = config.getContainerIds(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
+				linuxContainers = config.getContainerIds(KeyUtils.inBytes(vm.getPrivateKey()), vm.getUsername(), vm.getHost());
 			} catch (ContainerException e) {
 				logger.error("Failed to Fetch Container Ids", e);
 			}
@@ -62,7 +63,7 @@ public class ApplicationService {
 				ContainerDto container = new ContainerDto();
 				Map<String, String> containerStats = new HashMap<>();
 				try {
-					containerStats = config.getContainerStats(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), containerId);
+					containerStats = config.getContainerStats(KeyUtils.inBytes(vm.getPrivateKey()), vm.getUsername(), vm.getHost(), containerId);
 				} catch (ContainerException e) {
 					logger.error("Failed to get statistics of given container", e);
 				}

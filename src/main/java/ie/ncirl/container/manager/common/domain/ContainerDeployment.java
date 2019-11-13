@@ -2,13 +2,15 @@ package ie.ncirl.container.manager.common.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
 @Builder
 @Getter
+@ToString
+@Entity(name = "container_deployments")
 @Table(name = "container_deployments")
 public class ContainerDeployment {
 
@@ -20,7 +22,7 @@ public class ContainerDeployment {
      */
     private String containerId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private VM vm;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -46,4 +46,10 @@ TODO
  -->> Bes 
  
  
- # Design Pattern -> Converter Pattern
+ # Design Pattern -> Converter Pattern, Strategy Pattern
+ 
+ 
+ # Parallel Computing Problem -> When an deployment is under process another deployment can have
+ #  incorrect allocations due to wrong memory fetches from VMs
+ 
+ 
