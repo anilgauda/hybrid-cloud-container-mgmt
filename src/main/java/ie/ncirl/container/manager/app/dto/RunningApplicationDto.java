@@ -18,6 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 public class RunningApplicationDto implements DTO{
 	private static final long serialVersionUID = 1L;
+	private String applicationName;
 	private String providerName;
     private String containerId;
     private Map<String, String> containerStats;

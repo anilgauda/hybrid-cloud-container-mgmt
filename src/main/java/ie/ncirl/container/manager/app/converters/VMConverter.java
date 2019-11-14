@@ -11,7 +11,7 @@ public class VMConverter implements Converter<VMDTO, VM> {
     public VMDTO from(VM vm) {
         if (vm == null) return null;
         return VMDTO.builder().id(vm.getId()).name(vm.getName()).username(vm.getUsername())
-                .host(vm.getHost()).privateKey(KeyUtils.inString(vm.getPrivateKey())).build();
+                .host(vm.getHost()).privateKey(KeyUtils.inString(vm.getPrivateKey())).providerId(vm.getProvider().getId()).build();
     }
 
     @Override

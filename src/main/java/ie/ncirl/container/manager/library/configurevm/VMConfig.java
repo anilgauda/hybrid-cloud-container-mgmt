@@ -127,7 +127,7 @@ public class VMConfig {
 		return vmStatsMap;
 	}
 
-	public static void main(String args[]) throws IOException, JSchException, DockerException {
+	/*public static void main(String args[]) throws IOException, JSchException, DockerException {
 		String keyPath = "D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem";
 		String vmUser = "ec2-user";
 		String publicIp = "54.154.27.111";
@@ -151,6 +151,6 @@ public class VMConfig {
 		
 		config.startContainers(keyPath, vmUser, publicIp, repoPath);
 		containerIDs=config.getContainerIds(keyPath, vmUser, publicIp);
-		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));*/
-	}
+		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));
+	}*/
 }

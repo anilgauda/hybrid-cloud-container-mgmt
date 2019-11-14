@@ -1,6 +1,9 @@
 package ie.ncirl.container.manager.library.configurevm;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +17,8 @@ import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 
 public class ContainerConfig {
-	VMConnection connection=new VMConnection();
+	VMConnection connection = new VMConnection();
+
 	/***************
 	 * Method to get Map of Container Stats properties
 	 ***********************/
@@ -79,12 +83,13 @@ public class ContainerConfig {
 		for (int i = 0; i < containerIds.size(); i++) {
 			String containerid = containerIds.get(i);
 			if (StringUtils.isNotEmpty(containerid)) {
-				containerIds.set(i,containerid.substring(0, 12));
+				containerIds.set(i, containerid.substring(0, 12));
 			}
 		}
 		containerIds.forEach(s -> System.out.println(s));
 		return containerIds;
 	}
+
 	/***************
 	 * Method to get List of containers Running in a vm
 	 ***********************/
@@ -97,6 +102,39 @@ public class ContainerConfig {
 		}
 		return containerIds;
 	}
-
-
+	/***************
+	 * Method to get List of containers Running in a vm by reponame
+	 ***********************/
+	public ArrayList<String> getContainerIds(byte[] privateKey, String userName, String ipAddress,String repoName) throws ContainerException {
+		ArrayList<String> containerIds = new ArrayList<>();
+		try {
+			containerIds = connection.executeCommand(privateKey, userName, ipAddress, String.format(VMConstants.DOCKER_LIST_WITH_NAME_CONTAINER,repoName));
+		} catch (JSchException | IOException e) {
+			throw new ContainerException(VMConstants.DOCKER_START_FAILED_MSG, e);
+		}
+		return containerIds;
+	}
+	public static void main(String args[]) throws  ContainerException, IOException {
+		String keyPath = "D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem";
+		String vmUser = "ec2-user";
+		String publicIp = "54.154.27.111";
+		String repoPath = "anil2993/tomcat";
+		Path pkey=Paths.get(keyPath);
+		byte[] prvKey=Files.readAllBytes(pkey);
+		ContainerConfig config = new ContainerConfig();
+		ArrayList<String> containerIDs=null;
+		 containerIDs=config.getContainerIds(prvKey,vmUser,publicIp,repoPath);
+		 containerIDs.forEach(s -> System.out.println("Container Running :"+s));
+		 
+		 /*boolean
+		 isDockerInstalled=config.checkForDocker(keyPath, vmUser, publicIp); boolean
+		  isDockerStarted=config.checkForDockerService(keyPath, vmUser, publicIp);
+		  if(!isDockerInstalled) { config.installDocker(keyPath, vmUser, publicIp,
+		  linuxDist); } if(!isDockerStarted) { config.startDockerService(keyPath,
+		  vmUser, linuxDist); }
+		
+		config.startContainers(keyPath, vmUser, publicIp, repoPath);
+		containerIDs=config.getContainerIds(keyPath, vmUser, publicIp);
+		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));*/
+	}
 }

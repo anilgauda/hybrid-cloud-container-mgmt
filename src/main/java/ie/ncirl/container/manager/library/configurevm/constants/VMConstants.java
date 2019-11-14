@@ -29,6 +29,9 @@ public class VMConstants {
 	/**** List of docker containers running******/
 	public final static String DOCKER_LIST_CONTAINER="docker container ls -q";
 	
+	/***** List of docker containers with image name *****/
+	public final static String DOCKER_LIST_WITH_NAME_CONTAINER="docker container ls -f ancestor=%s -q";
+	
 	/******** Get Vm stats*****/
 	public final static String VM_STATS="vmstat";
 	

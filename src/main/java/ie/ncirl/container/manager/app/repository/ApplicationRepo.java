@@ -14,8 +14,7 @@ public interface ApplicationRepo extends JpaRepository<Application, Long>{
 
 	public Application findByName(String name);
 	
-	@Query("From Application a where a.user.id= :userId")
-	public List<Application> getAllApplicationByUserId(@Param("userId") Long userId);
+	public List<Application> findAllByUserId(Long userId);
 	
 	
 }

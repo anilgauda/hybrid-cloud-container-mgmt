@@ -1,5 +1,11 @@
 package ie.ncirl.container.manager.app.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import ie.ncirl.container.manager.app.converters.VMConverter;
 import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.app.repository.ProviderRepo;
@@ -7,10 +13,6 @@ import ie.ncirl.container.manager.app.repository.VMRepo;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.common.domain.VM;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -65,4 +67,12 @@ public class VMService {
         return 0;
     }
 
+    public List<VMDTO> findByUserId(Long userId){
+    	List<VMDTO> listOfVmDto=new ArrayList<>();
+    	List<VM> listOfVms=vmRepo.findAllByUserId(userId);
+    	for(VM vm:listOfVms) {
+    		listOfVmDto.add(converter.from(vm));
+    	}
+		return listOfVmDto;
+    }
 }

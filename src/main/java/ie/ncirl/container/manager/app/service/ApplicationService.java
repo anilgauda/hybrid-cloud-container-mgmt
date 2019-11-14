@@ -1,23 +1,22 @@
 package ie.ncirl.container.manager.app.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import ie.ncirl.container.manager.app.util.KeyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
-import ie.ncirl.container.manager.app.dto.ContainerDto;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
-import ie.ncirl.container.manager.app.dto.RunningApplicationDto;
 import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.app.repository.ApplicationRepo;
+import ie.ncirl.container.manager.app.util.KeyUtils;
 import ie.ncirl.container.manager.app.util.UserUtil;
+import ie.ncirl.container.manager.app.vo.ApplicationVo;
+import ie.ncirl.container.manager.app.vo.ContainerVo;
+import ie.ncirl.container.manager.app.vo.VmVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.User;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
@@ -45,36 +44,44 @@ public class ApplicationService {
 	@Autowired
 	private RegisterApplicationConvertor convertor;
 
-	public List<RunningApplicationDto> getRunningApplication() {
-		List<VMDTO> listOfVms = vmService.getAllVMs();// need to get vm baised on user
-		ContainerConfig config = new ContainerConfig();
-		List<RunningApplicationDto> applications = new ArrayList<>();
-		for (VMDTO vm : listOfVms) {
-			RunningApplicationDto app = new RunningApplicationDto();
-			List<ContainerDto> containers = new ArrayList<>();
-			app.setProviderName(providerService.getAllProviders().get(0).getName()); // Should be Multiple Providers
-			ArrayList<String> linuxContainers = new ArrayList<>();
-			try {
-				linuxContainers = config.getContainerIds(KeyUtils.inBytes(vm.getPrivateKey()), vm.getUsername(), vm.getHost());
-			} catch (ContainerException e) {
-				logger.error("Failed to Fetch Container Ids", e);
-			}
-			for (String containerId : linuxContainers) {
-				ContainerDto container = new ContainerDto();
-				Map<String, String> containerStats = new HashMap<>();
+	public List<ApplicationVo> getRunningApplication() {
+		List<VMDTO> listOfVms = vmService.findByUserId(userUtil.getCurrentUser().getId());
+		List<Application> listofApplication=applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId());
+		List<ApplicationVo> applicationVos=new ArrayList<>();
+		
+		for(Application application:listofApplication) {
+			ApplicationVo applicationVo=new ApplicationVo();
+			applicationVo.setApplicationName(application.getName());
+			List<VmVo> vmVos=new ArrayList<>();
+			for(VMDTO vms:listOfVms) {
+				VmVo vm=new VmVo();
+				vm.setName(vms.getName());
+				ContainerConfig config = new ContainerConfig();
+				ArrayList<String> linuxContainers = new ArrayList<>();
 				try {
-					containerStats = config.getContainerStats(KeyUtils.inBytes(vm.getPrivateKey()), vm.getUsername(), vm.getHost(), containerId);
+					linuxContainers = config.getContainerIds(KeyUtils.inBytes(vms.getPrivateKey()), vms.getUsername(), vms.getHost(),application.getRegistryImageUrl());// Should be with multiple application
 				} catch (ContainerException e) {
-					logger.error("Failed to get statistics of given container", e);
+					logger.error("Failed to Fetch Container Ids", e);
 				}
-				container.setContainerId(containerId);
-				container.setContainerStats(containerStats);
-				containers.add(container);
+				List<ContainerVo> containerVos=new ArrayList<>();
+				for (String containerId : linuxContainers) {
+					ContainerVo containers=new ContainerVo();
+					containers.setContainerId(containerId);
+					try {
+						containers.setStats(config.getContainerStats(KeyUtils.inBytes(vms.getPrivateKey()), vms.getUsername(), vms.getHost(),containerId));
+					} catch (ContainerException e) {
+						logger.error("Failed to get statistics of given container", e);
+					}
+					containerVos.add(containers);
+				}
+				vm.setContainers(containerVos);
+				vm.setProviderName(providerService.findById(vms.getProviderId()).getName());
+				vmVos.add(vm);
 			}
-			app.setContainers(containers);
-			applications.add(app);
+			applicationVo.setVms(vmVos);
+			applicationVos.add(applicationVo);
 		}
-		return applications;
+		return applicationVos;
 	}
 
 	public void saveApplication(RegisterApplicationDto regApplication) {
@@ -87,7 +94,7 @@ public class ApplicationService {
 
 	public List<RegisterApplicationDto> getApplicationsByUser() {
 		List<RegisterApplicationDto> registeredApplcationList = new ArrayList<>();
-		List<Application> applications = applicationRepo.getAllApplicationByUserId(userUtil.getCurrentUser().getId());
+		List<Application> applications = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId());
 		for (Application application : applications) {
 			registeredApplcationList.add(convertor.from(application));
 		}
@@ -110,5 +117,10 @@ public class ApplicationService {
 	}
 	public void deleteApplicationById(Long id) {
 		applicationRepo.deleteById(id);
+	}
+	public void deleteContainerById(String containerId) {
+		List<VMDTO> listOfVms = vmService.findByUserId(userUtil.getCurrentUser().getId());
+		ContainerConfig config = new ContainerConfig();	
+		//config.stopContainers(privateKey, userName, ipAddress, containerIds);
 	}
 }

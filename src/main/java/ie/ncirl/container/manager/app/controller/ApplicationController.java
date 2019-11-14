@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
-import ie.ncirl.container.manager.app.dto.RunningApplicationDto;
 import ie.ncirl.container.manager.app.service.ApplicationService;
-import ie.ncirl.container.manager.common.domain.Provider;
+import ie.ncirl.container.manager.app.vo.ApplicationVo;
 import ie.ncirl.container.manager.common.domain.validator.RegisterApplicationValidator;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +54,7 @@ public class ApplicationController {
 
 	@RequestMapping(value = "/runapp")
 	public String getRunningApplications(Model model) throws IOException, ContainerException {
-		List<RunningApplicationDto> applications = applicationService.getRunningApplication();
+		List<ApplicationVo> applications = applicationService.getRunningApplication();
 		model.addAttribute("applications", applications);
 		return "/application/runapp";
 	}
@@ -90,4 +89,12 @@ public class ApplicationController {
 			redirectAttributes.addFlashAttribute("message", String.format("Application %s saved successfully", regApplication.getName()));
 			return "redirect:/applicationList";
 		}
+	    
+	    @PostMapping(value = "/container/{containerId}/delete")
+	    public String deleteContainer(@PathVariable("containerId") String containerId,RedirectAttributes redirectAttributes) {
+	    	System.out.println("Delete Container");
+	    	
+			return "redirect:/runapp";
+	      
+	    }
 }
