@@ -31,9 +31,11 @@ public class Application {
 
     private String registryImageUrl;
 
-    private Integer cpu; // In % of total VM CPU predicted to be used.. This is used to optimize allocation
+    @Builder.Default
+    private Integer cpu = 0; // In % of total VM CPU predicted to be used.. This is used to optimize allocation
 
-    private Integer memory; // In MB of memory that app will use.. This is used in allocators
+    @Builder.Default
+    private Integer memory = 0; // In MB of memory that app will use.. This is used in allocators
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;

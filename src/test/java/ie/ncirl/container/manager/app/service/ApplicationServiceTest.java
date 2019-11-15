@@ -2,6 +2,7 @@ package ie.ncirl.container.manager.app.service;
 
 import java.util.List;
 
+import ie.ncirl.container.manager.app.vo.ApplicationVo;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +23,7 @@ public class ApplicationServiceTest {
 	
 	@Test
 	public void testGetRunningApp() {
-		List<RunningApplicationDto> applications=applicationService.getRunningApplication();
+		List<ApplicationVo> applications=applicationService.getRunningApplication();
 		Assert.assertNotNull("List of applications fetched failed ", applications);
 	}
 }

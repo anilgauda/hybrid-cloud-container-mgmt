@@ -34,8 +34,9 @@ public class VMConstants {
 	
 	/******** Get Vm stats*****/
 	public final static String VM_STATS="vmstat";
-	
-	/******************Get Containers Stats ******************/
+    public final static String VM_STAT_FREE_MEMORY = ":free";
+
+    /******************Get Containers Stats ******************/
 	public final static String CONTAINER_STATS="docker stats %s --no-stream";
 	
 	/***************Docker Container stop******************/
@@ -48,6 +49,5 @@ public class VMConstants {
     public final static String DOCKER_START_FAILED_MSG = "Failed to Start Docker Service";
     public final static String DOCKER_MISSING_MSG = "Docker is not Installed";
     public final static String DOCKER_SERVICE_NOT_RUNNING_MSG = "Docker Service is not running in VM";
-
 
 }

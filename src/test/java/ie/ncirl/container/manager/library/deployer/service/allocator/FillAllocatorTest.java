@@ -1,9 +1,8 @@
 package ie.ncirl.container.manager.library.deployer.service.allocator;
 
-import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.common.domain.Application;
-import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
+import ie.ncirl.container.manager.library.deployer.dto.Server;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,31 +13,31 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
-public class FillAppAllocatorTest {
+public class FillAllocatorTest {
 
     private int GB = 1000; // In MB
 
-    private List<VMDTO> vms = new ArrayList<>();
-    private VMDTO aws = VMDTO.builder().id(1L).host("aws.com").availableMemory(GB).build();
-    private VMDTO azure = VMDTO.builder().id(2L).host("azure.com").availableMemory(GB).build();
+    private List<Server> servers = new ArrayList<>();
+    private Server aws = Server.builder().host("aws.com").availableMemory(GB).build();
+    private Server azure = Server.builder().host("azure.com").availableMemory(GB).build();
 
     private Application app = Application.builder().name("app1").registryImageUrl("reg1").memory(500).build();
 
     @Before
     public void setup() {
-        vms.add(aws);
-        vms.add(azure);
+        servers.add(aws);
+        servers.add(azure);
     }
 
     @Test
     public void testShouldAllocateAppInVM() {
         int numDeployments = 2;
 
-        AppAllocatorStrategy allocator = new FillAppAllocator();
-        List<Allocation> actualAllocations = allocator.getAllocationData(app, numDeployments, vms).getAllocations();
+        AppAllocatorStrategy allocator = new FillAllocator();
+        List<Allocation> actualAllocations = allocator.getAllocationData(app, numDeployments, servers).getAllocations();
 
         List<Allocation> expectedAllocations = new ArrayList<>();
-        expectedAllocations.add(Allocation.builder().application(app).count(numDeployments).vm(aws).build());
+        expectedAllocations.add(Allocation.builder().application(app).count(numDeployments).server(aws).build());
 
         assertThat(actualAllocations, is(expectedAllocations));
     }
@@ -47,12 +46,12 @@ public class FillAppAllocatorTest {
     public void testShouldAllocateTwoInFirstAndOneInSecondVM() {
         int numDeployments = 3;
 
-        AppAllocatorStrategy allocator = new FillAppAllocator();
-        List<Allocation> actualAllocations = allocator.getAllocationData(app, numDeployments, vms).getAllocations();
+        AppAllocatorStrategy allocator = new FillAllocator();
+        List<Allocation> actualAllocations = allocator.getAllocationData(app, numDeployments, servers).getAllocations();
 
         List<Allocation> expectedAllocations = new ArrayList<>();
-        expectedAllocations.add(Allocation.builder().application(app).count(2).vm(aws).build());
-        expectedAllocations.add(Allocation.builder().application(app).count(1).vm(azure).build());
+        expectedAllocations.add(Allocation.builder().application(app).count(2).server(aws).build());
+        expectedAllocations.add(Allocation.builder().application(app).count(1).server(azure).build());
 
         assertThat(actualAllocations, is(expectedAllocations));
     }
@@ -62,9 +61,9 @@ public class FillAppAllocatorTest {
         int numDeployments = 5;
 
         AppAllocator allocator = new AppAllocator();
-        AppAllocatorStrategy fillStrategy = new FillAppAllocator();
+        AppAllocatorStrategy fillStrategy = new FillAllocator();
         allocator.setAppAllocatorStrategy(fillStrategy);
-        Integer failedAllocations = allocator.getAllocations(app, numDeployments, vms).getFailedAllocations();
+        Integer failedAllocations = allocator.getAllocations(app, numDeployments, servers).getFailedAllocations();
 
         assertThat(failedAllocations, greaterThan(0));
     }

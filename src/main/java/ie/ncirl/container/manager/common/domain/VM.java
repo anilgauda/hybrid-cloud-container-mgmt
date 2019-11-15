@@ -38,6 +38,10 @@ public class VM {
      */
     private String username;
 
+    /**
+     * Available memory of VM only populated on create!
+     */
+    private Integer memory;
 
     private byte[] privateKey;
 

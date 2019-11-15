@@ -1,6 +1,5 @@
 package ie.ncirl.container.manager.library.deployer.dto;
 
-import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.common.domain.Application;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,7 +15,7 @@ public class Allocation {
 
     private Application application;
 
-    private VMDTO vm;
+    private Server server;
 
     /**
      * By default there will be at least one application allocated
