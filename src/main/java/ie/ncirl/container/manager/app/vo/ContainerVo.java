@@ -16,6 +16,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContainerVo {
+	private String vmName;
+	private String providerName;
 	private String containerId;
 	private Map<String, String> stats;
 }

@@ -90,10 +90,10 @@ public class ApplicationController {
 			return "redirect:/applicationList";
 		}
 	    
-	    @PostMapping(value = "/container/{containerId}/delete")
-	    public String deleteContainer(@PathVariable("containerId") String containerId,RedirectAttributes redirectAttributes) {
-	    	System.out.println("Delete Container");
-	    	
+	    @GetMapping(value = "/application/{appId}/stop")
+	    public String deleteContainer(@PathVariable("appId") String appId,RedirectAttributes redirectAttributes) {
+	    	System.out.println("Stop Application"+ Long.parseLong(appId));
+	    	applicationService.stopApplication(Long.parseLong(appId));
 			return "redirect:/runapp";
 	      
 	    }

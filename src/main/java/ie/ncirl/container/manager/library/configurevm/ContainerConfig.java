@@ -48,8 +48,8 @@ public class ContainerConfig {
 				containerValFilt.add(val);
 			}
 		}
-		System.out.println("Length of the keys array" + containerParamFilt.size()); // Logger INFO
-		System.out.println("Length of the val array" + containerValFilt.size()); // Logger INFO
+		//System.out.println("Length of the keys array" + containerParamFilt.size()); // Logger INFO
+		//System.out.println("Length of the val array" + containerValFilt.size()); // Logger INFO
 		for (int i = 0; i < containerParamFilt.size(); i++) {
 			containerStatsMap.put(containerParamFilt.get(i), containerValFilt.get(i));
 		}

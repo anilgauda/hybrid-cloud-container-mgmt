@@ -17,5 +17,6 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ApplicationVo {
 	private String applicationName;
-	private List<VmVo> vms;
+	private Long appId;
+	private List<ContainerVo> containers;
 }

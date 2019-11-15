@@ -46,6 +46,7 @@ public class DeploymentController {
 		model.addAttribute("deploymentVo", new DeploymentVo());
 		return "deployapp";
 	}
+	
 	@PostMapping(value="/deploy/{Id}")
 	public String deployApplicationWithType(@Valid @ModelAttribute DeploymentVo deploymentVo,@PathVariable("Id")String appId,RedirectAttributes redirectAttributes) {
 		System.out.println(appId);

@@ -31,46 +31,31 @@
 							<td th:text="${appList.registryImageUrl}"></td>
 							<td th:text="${appList.cpu}"></td>
 							<td th:text="${appList.memory}"></td>
-							<td><button class="btn btn-success btn-icon-split" data-toggle="modal"
-									data-target="#deployForm">
-									<span class="icon text-white-50"> <i class="fas fa-check"></i>
-									</span> <span class="text">Deploy</span>
-								</button> <!-- Modal -->
-								<div class="modal fade bd-example-modal-lg" id="deployForm" tabindex="-1" role="dialog"
-									aria-labelledby="myLargeModalLabel" aria-hidden="true">
-									<div class="modal-dialog modal-lg">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h5 class="modal-title">Deployment Parameters</h5>
-												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-													<span aria-hidden="true">&times;</span>
-												</button>
-											</div>
-											<form class="user" method="post" action="#" th:object="${deploymentVo}" th:action="@{|/deploy/${appList.Id}|}">
-												<div class="modal-body">
-													<div class="form-group">
-														<label for="provider">Select Virtual Machine</label>
-														 <select class="form-control" required="required" name="providerId" id="provider" th:value="${deploymentVo.vmId}" th:field="*{vmId}">
-															<option value="selectVM" disabled="disabled" selected="selected">-- Select a VM --</option>
-															 <option th:each="vms : ${availableVms}" th:value="${vms.id}" th:text="${vms.name}"></option>
-														</select>
-													</div>
-													<div class="form-group">
-														<label for="provider">Select Algorithm</label> 
-														<select class="form-control"
-															required="required" name="deploymnetType" id="deploymnetType" th:value="${deploymentVo.deploymentType}" th:field="*{deploymentType}">
-															<option value="deploymentType" disabled="disabled" selected="selected">-- Select a Algorithm--</option>
-															<option th:each="type : ${availableTypes}" th:value="${type.getCode()}" th:text="${type.name()}"></option>
-														</select>
-													</div>
-												</div>
-												<div class="modal-footer">
-													<input id="submitDeployment" type="submit" class="btn btn-success" value="Deploy">
-												</div>
-											</form>
-										</div>
+							<td>
+								<form class="user" method="post" action="#" th:object="${deploymentVo}"
+									th:action="@{|/deploy/${appList.Id}|}">
+									<div class="form-group">
+										<label for="provider">Select Virtual Machine</label> <select class="form-control"
+											required="required" name="providerId" id="provider" th:value="${deploymentVo.vmId}"
+											th:field="*{vmId}">
+											<option value="selectVM" disabled="disabled" selected="selected">-- Select a VM
+												--</option>
+											<option th:each="vms : ${availableVms}" th:value="${vms.id}" th:text="${vms.name}"></option>
+										</select>
 									</div>
-								</div></td>
+									<div class="form-group">
+										<label for="provider">Select Algorithm</label> <select class="form-control"
+											required="required" name="deploymnetType" id="deploymnetType"
+											th:value="${deploymentVo.deploymentType}" th:field="*{deploymentType}">
+											<option value="deploymentType" disabled="disabled" selected="selected">-- Select
+												a Algorithm--</option>
+											<option th:each="type : ${availableTypes}" th:value="${type.getCode()}"
+												th:text="${type.name()}"></option>
+										</select>
+									</div>
+									<input id="submitDeployment" type="submit" class="btn btn-success" value="Deploy">
+								</form>
+							</td>
 						</tr>
 					</tbody>
 				</table>

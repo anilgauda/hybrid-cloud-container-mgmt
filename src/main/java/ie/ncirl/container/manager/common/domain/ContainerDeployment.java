@@ -1,7 +1,9 @@
 package ie.ncirl.container.manager.common.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -12,8 +14,11 @@ import java.time.LocalDateTime;
 @ToString
 @Entity(name = "container_deployments")
 @Table(name = "container_deployments")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContainerDeployment {
 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
     private Long id;
 
