@@ -53,14 +53,13 @@ public class VMConfigureTest {
 	@Test
 	public void testGetLinuxDistribution() {
 		VMConfig config = new VMConfig();
-		ArrayList<String> linuxDist = new ArrayList<>();
+		String dist = null;
 		try {
-			linuxDist = config.getLinuxDistribution(privateKey, USERNAME, IP_ADDRESS);
+			dist = config.getLinuxDistribution(privateKey, USERNAME, IP_ADDRESS);
 		} catch (DockerException e) {
 			log.error("Docker Connection Failed", e);
 		}
-		String dist = linuxDist.get(0);
-		Assert.assertTrue("Supported OS", dist.contains(VMConstants.OS_FEDORA) || dist.contains(VMConstants.OS_DEBIAN));
+		Assert.assertTrue("Supported OS", dist.equalsIgnoreCase(VMConstants.OS_FEDORA) || dist.equalsIgnoreCase(VMConstants.OS_DEBIAN));
 	}
 
 	@Test

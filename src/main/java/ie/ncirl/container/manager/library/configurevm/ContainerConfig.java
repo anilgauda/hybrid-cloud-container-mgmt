@@ -24,19 +24,20 @@ public class ContainerConfig {
 	 ***********************/
 	public Map<String, String> getContainerStats(byte[] privateKey, String userName, String ipAddress, String containerID) throws ContainerException {
 		ArrayList<String> containerStats = new ArrayList<>();
+		Map<String, String> containerStatsMap = new HashMap<>();
+		List<String> containerParamFilt = new ArrayList<>();
+		List<String> containerValFilt = new ArrayList<>();
+
 		try {
 			containerStats = connection.executeCommand(privateKey, userName, ipAddress, String.format(VMConstants.CONTAINER_STATS, containerID));
 		} catch (JSchException | IOException e) {
 			throw new ContainerException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
-		System.out.println(containerStats.get(0));// Logger INFO
-		System.out.println(containerStats.get(1));// Logger INFO
+		if(!containerStats.isEmpty()) {
 		String[] containerParam = containerStats.get(0).split("  ");
 		String[] containerVal = containerStats.get(1).split("  ");
 
-		List<String> containerParamFilt = new ArrayList<>();
-		List<String> containerValFilt = new ArrayList<>();
-		Map<String, String> containerStatsMap = new HashMap<>();
+		
 
 		for (String val : containerParam) {
 			if (StringUtils.isNotBlank(val)) {
@@ -55,6 +56,7 @@ public class ContainerConfig {
 		}
 
 		containerStatsMap.forEach((k, v) -> System.out.println("Key :" + k + "  Value :" + v)); // Logger INFO
+		}
 		return containerStatsMap;
 	}
 

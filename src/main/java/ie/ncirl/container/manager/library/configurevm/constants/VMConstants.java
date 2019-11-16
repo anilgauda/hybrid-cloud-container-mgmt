@@ -11,11 +11,11 @@ public class VMConstants {
 
     public final static String LINUX_DISTRIBUTION = "cat /etc/os-release | grep ID_LIKE";
     /******** Install and configure Docker Commands for Debian based OS *******************/
-    public final static String DINSTALL_DOCKER_COMMAND = "sudo apt-get install docker-engine -y";
+    public final static String DINSTALL_DOCKER_COMMAND = "sudo apt-get install docker -y";
     public final static String START_DOCKER_SERVICE = "sudo service docker start";
 
     /******** Install and configure Docker Commands for Fedora based OS *******************/
-    public final static String FINSTALL_DOCKER_COMMAND = "sudo yum install docker-engine -y";
+    public final static String FINSTALL_DOCKER_COMMAND = "sudo yum install docker -y";
 /******** Get Docker containers based on image name processes  *******************/
 	//Right now it is hello-world
 	public final static String DOCKER_PROCESSES_COMMAND="sudo docker ps -aqf ancestor=hello-world";

@@ -20,7 +20,7 @@ import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 public class VMConfig {
 	VMConnection connection=new VMConnection();
 
-	public ArrayList<String> getLinuxDistribution( byte[] privateKey, String userName, String ipAddress) throws DockerException {
+	public String getLinuxDistribution( byte[] privateKey, String userName, String ipAddress) throws DockerException {
 		ArrayList<String> result = new ArrayList<>();
 		try {
 			result = connection.executeCommand(privateKey, userName, ipAddress, VMConstants.LINUX_DISTRIBUTION);
@@ -34,14 +34,14 @@ public class VMConfig {
 		} catch (JSchException | IOException e) {
 			throw new DockerException(VMConstants.DOCKER_INSTALL_FAILED_MSG, e);
 		}
-		return result;
+		return result.get(0);
 	}
 
 	public void installDocker(byte[] privateKey, String userName, String ipAddress, String linuxDist) throws DockerException {
 		try {
-			if (linuxDist.equalsIgnoreCase(VMConstants.OS_FEDORA)) {
+			if (linuxDist.contains(VMConstants.OS_FEDORA)) {
 				connection.executeCommand(privateKey, userName, ipAddress, VMConstants.FINSTALL_DOCKER_COMMAND);
-			} else if (linuxDist.equalsIgnoreCase(VMConstants.OS_DEBIAN)) {
+			} else if (linuxDist.contains(VMConstants.OS_DEBIAN)) {
 				connection.executeCommand(privateKey, userName, ipAddress, VMConstants.DINSTALL_DOCKER_COMMAND);
 			}
 		} catch (JSchException | IOException e) {
@@ -66,7 +66,7 @@ public class VMConfig {
 		} catch (JSchException | IOException e) {
 			throw new DockerException(VMConstants.DOCKER_MISSING_MSG, e);
 		}
-		if (result.get(0) != null && !result.get(0).contains("Docker version")) {// Need to use Regex for matching
+		if (result.isEmpty()) {// Need to use Regex for matching
 			isDockerInstalled = false;
 		}
 		return isDockerInstalled;
@@ -81,7 +81,7 @@ public class VMConfig {
 		} catch (JSchException | IOException e) {
 			throw new DockerException(VMConstants.DOCKER_SERVICE_NOT_RUNNING_MSG, e);
 		}
-		if (result.get(0) != null && result.get(0).contains("inactive")) {// Need to use Regex for matching
+		if (!result.isEmpty() && result.get(0) != null && result.get(0).contains("inactive")) {// Need to use Regex for matching
 			isDockerServiceRunning = false;
 		}
 
