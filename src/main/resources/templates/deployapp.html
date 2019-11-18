@@ -37,7 +37,7 @@
 									<div class="form-group">
 										<label for="provider">Select Virtual Machine</label> <select class="form-control"
 											required="required" name="providerId" id="provider" th:value="${deploymentVo.vmId}"
-											th:field="*{vmId}">
+											th:field="*{vmId}" multiple>
 											<option value="selectVM" disabled="disabled" selected="selected">-- Select a VM
 												--</option>
 											<option th:each="vms : ${availableVms}" th:value="${vms.id}" th:text="${vms.name}"></option>

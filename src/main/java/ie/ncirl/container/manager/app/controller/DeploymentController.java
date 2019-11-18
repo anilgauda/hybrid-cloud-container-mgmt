@@ -52,8 +52,10 @@ public class DeploymentController {
 		System.out.println(appId);
 		System.out.println(deploymentVo.getVmId());
 		System.out.println(deploymentVo.getDeploymentType());
-		
-		deploymentService.deployContainers(Long.parseLong(appId),Long.parseLong(deploymentVo.getVmId()),Integer.parseInt(deploymentVo.getDeploymentType()));
+		for(String deploymentId:deploymentVo.getVmId()) {
+			deploymentService.deployContainers(Long.parseLong(appId),Long.parseLong(deploymentId),Integer.parseInt(deploymentVo.getDeploymentType()));
+
+		}
 		//deploymentService.deployContainers(Long.parseLong(appId));
 		return"redirect:/deployapp";
 	}

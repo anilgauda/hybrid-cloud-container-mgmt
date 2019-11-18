@@ -34,7 +34,6 @@ public class VMConstants {
 	
 	/******** Get Vm stats*****/
 	public final static String VM_STATS="vmstat";
-    public final static String VM_STAT_FREE_MEMORY = ":free";
 
     /******************Get Containers Stats ******************/
 	public final static String CONTAINER_STATS="docker stats %s --no-stream";
