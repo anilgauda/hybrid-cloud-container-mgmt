@@ -1,22 +1,25 @@
 package ie.ncirl.container.manager.library.deployer.service.allocator;
 
 import ie.ncirl.container.manager.common.domain.Application;
+import ie.ncirl.container.manager.common.domain.ContainerDeployment;
+import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
-import ie.ncirl.container.manager.library.deployer.dto.Server;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SpreadAllocator implements AppAllocatorStrategy {
     @Override
-    public AllocationData getAllocationData(Application application, Integer numDeployments, List<Server> servers) {
+    public AllocationData getAllocationData(Application application, Integer numDeployments, List<VM> servers) {
         List<Allocation> allocations = new ArrayList<>();
         int pendingAllocations = numDeployments;
-        for (Server server : servers) {
-
-            List<Application> applications = server.getApplications();
+        for (VM server : servers) {
+            List<Application> applications = server.getContainerDeployments().stream()
+                    .map(ContainerDeployment::getApplication).distinct()
+                    .collect(Collectors.toList());
             Optional<Application> deployment = applications.stream().filter(
                     app -> app.equals(application)
             ).findAny();

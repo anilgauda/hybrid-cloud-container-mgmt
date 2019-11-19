@@ -4,7 +4,7 @@
 <section class="container-fluid" th:fragment="content">
 	<!-- Page Heading -->
 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
-		<h1 class="h3 mb-0 text-gray-800">Deployed Application</h1>
+		<h1 class="h3 mb-0 text-gray-800">Deploy Application</h1>
 	</div>
 	<!-- Basic Card Example -->
 	<div class="card shadow mb-4">
@@ -34,10 +34,14 @@
 							<td>
 								<form class="user" method="post" action="#" th:object="${deploymentVo}"
 									th:action="@{|/deploy/${appList.Id}|}">
+									<div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+										<div th:errors="*{numDeployments}"></div>
+										<div th:errors="*{allocation}"></div>
+									</div>
 									<div class="form-group">
 										<label for="provider">Select Virtual Machine</label> <select class="form-control"
-											required="required" name="providerId" id="provider" th:value="${deploymentVo.vmId}"
-											th:field="*{vmId}" multiple>
+											required="required" name="providerId" id="provider" th:value="${deploymentVo.vmIds}"
+											th:field="*{vmIds}" multiple>
 											<option value="selectVM" disabled="disabled" selected="selected">-- Select a VM
 												--</option>
 											<option th:each="vms : ${availableVms}" th:value="${vms.id}" th:text="${vms.name}"></option>
@@ -52,6 +56,11 @@
 											<option th:each="type : ${availableTypes}" th:value="${type.getCode()}"
 												th:text="${type.name()}"></option>
 										</select>
+									</div>
+									<div class="form-group">
+										<label for="count">No. of deployments</label>
+										<input type="number" class="form-control" id="count" required
+											   placeholder="No. of deployments for this application" th:field="*{numDeployments}">
 									</div>
 									<input id="submitDeployment" type="submit" class="btn btn-success" value="Deploy">
 								</form>

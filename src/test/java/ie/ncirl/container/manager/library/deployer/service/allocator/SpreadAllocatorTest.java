@@ -1,9 +1,10 @@
 package ie.ncirl.container.manager.library.deployer.service.allocator;
 
 import ie.ncirl.container.manager.common.domain.Application;
+import ie.ncirl.container.manager.common.domain.ContainerDeployment;
+import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
-import ie.ncirl.container.manager.library.deployer.dto.Server;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,9 +19,9 @@ public class SpreadAllocatorTest {
 
     private int GB = 1000; // In MB
 
-    private List<Server> servers = new ArrayList<>();
-    private Server aws = Server.builder().host("aws.com").availableMemory(GB).build();
-    private Server azure = Server.builder().host("azure.com").availableMemory(GB).build();
+    private List<VM> servers = new ArrayList<>();
+    private VM aws = VM.builder().host("aws.com").memory(GB).build();
+    private VM azure = VM.builder().host("azure.com").memory(GB).build();
 
     private Application app = Application.builder().name("app1").registryImageUrl("reg1").memory(400).build();
 
@@ -67,9 +68,9 @@ public class SpreadAllocatorTest {
     public void testShouldNotAllocateWithSameExistingApp() {
         int numDeployments = 2;
 
-        List<Application> applications = new ArrayList<>();
-        applications.add(app);
-        aws.setApplications(applications);
+        List<ContainerDeployment> containerDeployments = new ArrayList<>();
+        containerDeployments.add(ContainerDeployment.builder().application(app).build());
+        aws.setContainerDeployments(containerDeployments);
         AppAllocator allocator = new AppAllocator();
         allocator.setAppAllocatorStrategy(new SpreadAllocator());
 

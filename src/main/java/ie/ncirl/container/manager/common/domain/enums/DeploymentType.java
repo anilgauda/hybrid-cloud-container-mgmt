@@ -8,7 +8,7 @@ public enum DeploymentType {
 
 
 
-    FILL(100), SPREAD(200), OPTIMIZE(300);
+    FILL(100), SPREAD(200);
 
     @Getter
     private int code;
@@ -23,8 +23,6 @@ public enum DeploymentType {
                 return DeploymentType.FILL;
             case 200:
                 return DeploymentType.SPREAD;
-            case 300:
-                return DeploymentType.OPTIMIZE;
 
             default:
                 throw new IllegalArgumentException("Code [" + code + "] not supported.");

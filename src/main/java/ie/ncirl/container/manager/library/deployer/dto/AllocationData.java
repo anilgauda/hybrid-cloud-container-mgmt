@@ -3,6 +3,7 @@ package ie.ncirl.container.manager.library.deployer.dto;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Builder
 @Getter
 @EqualsAndHashCode
+@ToString
 public class AllocationData {
 
     private List<Allocation> allocations;

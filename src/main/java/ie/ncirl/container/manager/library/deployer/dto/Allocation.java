@@ -1,8 +1,11 @@
 package ie.ncirl.container.manager.library.deployer.dto;
 
 import ie.ncirl.container.manager.common.domain.Application;
+import ie.ncirl.container.manager.common.domain.VM;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * This is a simple class used to define an allocation for a particular VM
@@ -11,11 +14,13 @@ import lombok.EqualsAndHashCode;
  */
 @Builder
 @EqualsAndHashCode
+@Getter
+@ToString
 public class Allocation {
 
     private Application application;
 
-    private Server server;
+    private VM server;
 
     /**
      * By default there will be at least one application allocated

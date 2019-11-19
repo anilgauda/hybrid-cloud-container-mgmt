@@ -9,7 +9,6 @@ import ie.ncirl.container.manager.library.configurevm.exception.ContainerExcepti
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
-import ie.ncirl.container.manager.library.deployer.dto.Server;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,7 +100,7 @@ public class ZigZagOptimizer implements Optimizer {
                 memSortedContainers.remove(container); // maybe use a mark and sweep like algorithm
 
                 Allocation allocation = Allocation.builder()
-                        .server(new Server(vm))
+                        .server(vm)
                         .application(container.getApplication())
                         .count(1)
                         .build();
@@ -169,11 +168,10 @@ public class ZigZagOptimizer implements Optimizer {
     private List<Container> getAllContainersInVMs(List<VM> vms) {
         return vms.stream().flatMap(
                 vm -> vm.getContainerDeployments().stream().map(containerDeployment -> {
-                    Server server = new Server(vm);
                     return Container.builder()
                             .id(containerDeployment.getContainerId())
                             .application(containerDeployment.getApplication())
-                            .server(server)
+                            .server(vm)
                             .cpu(containerDeployment.getApplication().getCpu())
                             .memory(containerDeployment.getApplication().getMemory())
                             .build();

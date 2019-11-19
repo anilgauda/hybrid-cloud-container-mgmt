@@ -11,12 +11,14 @@ public class VMConverter implements Converter<VMDTO, VM> {
     public VMDTO from(VM vm) {
         if (vm == null) return null;
         return VMDTO.builder().id(vm.getId()).name(vm.getName()).username(vm.getUsername())
-                .host(vm.getHost()).privateKey(KeyUtils.inString(vm.getPrivateKey())).providerId(vm.getProvider().getId()).build();
+                .host(vm.getHost()).privateKey(KeyUtils.inString(vm.getPrivateKey()))
+                .providerId(vm.getProvider().getId()).memory(vm.getMemory()).build();
     }
 
     @Override
     public VM from(VMDTO vmDTO) {
         return VM.builder().id(vmDTO.getId()).name(vmDTO.getName()).username(vmDTO.getUsername())
-                .host(vmDTO.getHost()).privateKey(KeyUtils.inBytes(vmDTO.getPrivateKey())).build();
+                .host(vmDTO.getHost()).privateKey(KeyUtils.inBytes(vmDTO.getPrivateKey()))
+                .memory(vmDTO.getMemory()).build();
     }
 }

@@ -1,8 +1,8 @@
 package ie.ncirl.container.manager.library.deployer.service.allocator;
 
 import ie.ncirl.container.manager.common.domain.Application;
+import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
-import ie.ncirl.container.manager.library.deployer.dto.Server;
 
 import java.util.List;
 
@@ -22,5 +22,5 @@ public interface AppAllocatorStrategy {
      * @param vms            he decrypted server private keys where these images can be deployed into
      * @return allocation data
      */
-    AllocationData getAllocationData(Application application, Integer numDeployments, List<Server> vms);
+    AllocationData getAllocationData(Application application, Integer numDeployments, List<VM> vms);
 }

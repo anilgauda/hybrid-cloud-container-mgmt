@@ -7,7 +7,6 @@ import ie.ncirl.container.manager.library.configurevm.exception.ContainerExcepti
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
-import ie.ncirl.container.manager.library.deployer.dto.Server;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class ZigZagOptimizerTest {
         List<Allocation> expectedAllocations = new ArrayList<>();
         expectedAllocations.add(
                 Allocation.builder()
-                        .server(new Server(aws))
+                        .server(aws)
                         .application(awsApp1)
                         .count(1)
                         .build());
@@ -99,7 +98,7 @@ public class ZigZagOptimizerTest {
      */
     private Allocation buildAllocationObject(VM vm, Application application) {
         return Allocation.builder()
-                .server(new Server(vm))
+                .server(vm)
                 .application(application)
                 .count(1)
                 .build();

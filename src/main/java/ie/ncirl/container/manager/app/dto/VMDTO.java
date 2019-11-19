@@ -27,6 +27,8 @@ public class VMDTO implements DTO {
     @ToString.Exclude
     private String privateKey;
 
+    private Integer memory;
+
     @NotNull(message = "Please select a provider")
     private Long providerId;
 }

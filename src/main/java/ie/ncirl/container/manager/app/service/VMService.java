@@ -1,12 +1,5 @@
 package ie.ncirl.container.manager.app.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import ie.ncirl.container.manager.app.converters.VMConverter;
 import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.app.repository.ProviderRepo;
@@ -17,6 +10,12 @@ import ie.ncirl.container.manager.library.configurevm.VMConfig;
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -26,6 +25,7 @@ public class VMService {
     VMRepo vmRepo;
 
     @Autowired
+    private
     ProviderRepo providerRepo;
 
     @Autowired
@@ -42,6 +42,10 @@ public class VMService {
 
     public VMDTO findByName(String name) {
         return converter.from(vmRepo.findByName(name));
+    }
+
+    public VM findVMById(Long id) {
+        return vmRepo.getOne(id);
     }
 
     public VMDTO findById(Long id) {
@@ -73,7 +77,7 @@ public class VMService {
      * @param vm VM/server
      * @return memory in integer
      */
-    private Integer getAvailableMemory(VM vm) {
+    public Integer getAvailableMemory(VM vm) {
 
         VMConfig config = new VMConfig();
         try {
@@ -87,12 +91,12 @@ public class VMService {
         return 0;
     }
 
-    public List<VMDTO> findByUserId(Long userId){
-    	List<VMDTO> listOfVmDto=new ArrayList<>();
-    	List<VM> listOfVms=vmRepo.findAllByUserId(userId);
-    	for(VM vm:listOfVms) {
-    		listOfVmDto.add(converter.from(vm));
-    	}
-		return listOfVmDto;
+    public List<VMDTO> findByUserId(Long userId) {
+        List<VMDTO> listOfVmDto = new ArrayList<>();
+        List<VM> listOfVms = vmRepo.findAllByUserId(userId);
+        for (VM vm : listOfVms) {
+            listOfVmDto.add(converter.from(vm));
+        }
+        return listOfVmDto;
     }
 }
