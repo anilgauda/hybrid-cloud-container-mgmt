@@ -13,16 +13,16 @@ import ie.ncirl.container.manager.common.domain.enums.DeploymentType;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
+import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import ie.ncirl.container.manager.library.deployer.service.allocator.AppAllocator;
 import ie.ncirl.container.manager.library.deployer.service.allocator.FillAllocator;
 import ie.ncirl.container.manager.library.deployer.service.allocator.SpreadAllocator;
+import ie.ncirl.container.manager.library.deployer.service.optimizer.Optimizer;
+import ie.ncirl.container.manager.library.deployer.service.optimizer.ZigZagOptimizer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +100,26 @@ public class ContainerDeploymentService {
         }
     }
 
+    /**
+     * Stops docker container in a VM and removes the ContainerDeployment object from db
+     *
+     * @param containerId Container id
+     * @param vm VM
+     */
+    private void undeployContainer(String containerId, VM vm) {
+        List<String> containerIds = new ArrayList<>();
+        containerIds.add(containerId);
+        ContainerConfig config = new ContainerConfig();
+        try {
+            config.stopContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(),
+                    containerIds);
+        } catch (ContainerException e) {
+            log.error("Error occurred while stopping container", e);
+        }
+        containerRepo.deleteByContainerId(containerId);
+    }
+
+
     private void saveContainers(ContainerDeployment containerDeployment) {
         containerRepo.save(containerDeployment);
     }
@@ -131,7 +151,7 @@ public class ContainerDeploymentService {
      * @param deploymentVo DeploymentVo generated from form
      * @return Allocations
      */
-    public AllocationData getAllocationData(@PathVariable("Id") String appId, @ModelAttribute @Valid DeploymentVo deploymentVo) {
+    public AllocationData getAllocationData(String appId, DeploymentVo deploymentVo) {
         AppAllocator allocator = new AppAllocator();
         switch (DeploymentType.fromCode((Integer.parseInt(deploymentVo.getDeploymentType())))) {
             case FILL:
@@ -148,4 +168,33 @@ public class ContainerDeploymentService {
         return allocator.getAllocations(application, deploymentVo.getNumDeployments(), servers);
     }
 
+    /**
+     * Optimizes all contains in vms by running the ZigZag optimizer algorithm
+     *
+     * @param vms VMs
+     * @return Optimal Containers
+     */
+    private List<OptimalContainer> getOptimalContainers(List<VM> vms) {
+        Optimizer optimizer = new ZigZagOptimizer();
+        List<OptimalContainer> optimalContainers = new ArrayList<>();
+        try {
+            optimalContainers = optimizer.getOptimalContainerData(vms);
+        } catch (ContainerException e) {
+            log.error("Failed to optimize vm containers", e);
+        }
+
+        return optimalContainers;
+    }
+
+    /**
+     * Optimizes all VMs by moving them optimally across VMs
+     * @param vms VMs where optimization algorithm will run
+     */
+    public void optimizeContainers(List<VM> vms) {
+        List<OptimalContainer> optimalContainers = getOptimalContainers(vms);
+        for (OptimalContainer optimalContainer : optimalContainers) {
+            deployContainer(optimalContainer.getContainer().getApplication(), optimalContainer.getOptimalVM());
+            undeployContainer(optimalContainer.getContainer().getId(), optimalContainer.getContainer().getServer());
+        }
+    }
 }

@@ -5,8 +5,7 @@ import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
-import ie.ncirl.container.manager.library.deployer.dto.Allocation;
-import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
+import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -35,15 +34,13 @@ public class ZigZagOptimizerTest {
         vms.add(aws);
 
         Optimizer optimizer = new ZigZagOptimizer();
-        AllocationData allocationData = optimizer.getAllocationData(vms);
-        List<Allocation> actualAllocations = allocationData.getAllocations();
+        List<OptimalContainer> actualAllocations = optimizer.getOptimalContainerData(vms);
 
-        List<Allocation> expectedAllocations = new ArrayList<>();
+        List<OptimalContainer> expectedAllocations = new ArrayList<>();
         expectedAllocations.add(
-                Allocation.builder()
-                        .server(aws)
-                        .application(awsApp1)
-                        .count(1)
+                OptimalContainer.builder()
+                        .optimalVM(aws)
+                        .container(buildContainerObject(awsApp1Container1, aws))
                         .build());
 
         assertThat(actualAllocations, is(expectedAllocations));
@@ -77,33 +74,16 @@ public class ZigZagOptimizerTest {
         vms.add(azure);
 
         Optimizer optimizer = new ZigZagOptimizer();
-        AllocationData allocationData = optimizer.getAllocationData(vms);
-        List<Allocation> actualAllocations = allocationData.getAllocations();
+        List<OptimalContainer> actualContainers = optimizer.getOptimalContainerData(vms);
 
-        List<Allocation> expectedAllocations = new ArrayList<>();
-        expectedAllocations.add(buildAllocationObject(aws, awsApp2));
-        expectedAllocations.add(buildAllocationObject(aws, awsApp3));
-        expectedAllocations.add(buildAllocationObject(azure, awsApp4));
-        expectedAllocations.add(buildAllocationObject(azure, awsApp1));
+        List<OptimalContainer> expectedContainers = new ArrayList<>();
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp2Container, aws), aws));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp3Container, azure), aws));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp4Container, azure), azure));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp1Container, aws), azure));
 
-        assertThat(actualAllocations, is(expectedAllocations));
+        assertThat(actualContainers, is(expectedContainers));
     }
-
-    /**
-     * Creates an Allocation object for allocating a container in a VM
-     *
-     * @param vm          VM where the container will be allocated
-     * @param application The application to which the container belongs
-     * @return Allocation object
-     */
-    private Allocation buildAllocationObject(VM vm, Application application) {
-        return Allocation.builder()
-                .server(vm)
-                .application(application)
-                .count(1)
-                .build();
-    }
-
 
     /**
      * Helper method to generate unique containers from Application.
@@ -132,4 +112,35 @@ public class ZigZagOptimizerTest {
                 .containerDeployments(containerDeployments).build();
     }
 
+    /**
+     * Helper method to build Container object
+     *
+     * @param containerDeployment ContainerDeployment existing in VM
+     * @param vm                  VM
+     * @return Container
+     */
+    private Container buildContainerObject(ContainerDeployment containerDeployment, VM vm) {
+        return Container.builder()
+                .id(containerDeployment.getContainerId())
+                .application(containerDeployment.getApplication())
+                .server(vm)
+                .cpu(containerDeployment.getApplication().getCpu())
+                .memory(containerDeployment.getApplication().getMemory())
+                .build();
+    }
+
+    /**
+     * Create an OptimalContainer object
+     *
+     * @param container Container
+     * @param vm        Virtual Machine
+     * @return OptimalContainer objectawsApp2Container
+     */
+    private OptimalContainer buildOptimalContainerObject(Container container, VM vm) {
+        return OptimalContainer.builder()
+                .container(container)
+                .optimalVM(vm)
+                .build();
+
+    }
 }

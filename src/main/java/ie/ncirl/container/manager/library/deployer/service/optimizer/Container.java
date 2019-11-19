@@ -3,10 +3,12 @@ package ie.ncirl.container.manager.library.deployer.service.optimizer;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.VM;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Builder
-@Getter
+@Data
+@EqualsAndHashCode
 public class Container {
 
     private String id;

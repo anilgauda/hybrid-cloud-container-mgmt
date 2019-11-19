@@ -16,13 +16,7 @@ public class FillAllocator implements AppAllocatorStrategy {
         int pendingAllocations = numDeployments;
         int allocatableContainersInVM, allocatedContainersInVM;
         for (VM vm : vms) {
-            List<ContainerDeployment> deployments = vm.getContainerDeployments();
-            // Same containers will query db every time to get application. TODO: Improvement possible
-            Integer usedMemory = deployments.stream().mapToInt(deployment -> deployment.getApplication().getMemory()).sum();
-
-            // How many containers/deployments of this applications can be allocated in this VM ?
-            Integer availableMemory = vm.getMemory() - usedMemory;
-            allocatableContainersInVM = (int) (availableMemory / application.getMemory());
+            allocatableContainersInVM = getAllocatableContainersInVM(application, vm);
             if (allocatableContainersInVM > 0) {
                 allocatedContainersInVM = Math.min(allocatableContainersInVM, pendingAllocations);
                 pendingAllocations -= allocatedContainersInVM;

@@ -6,9 +6,7 @@ import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.constants.ContainerConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
-import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
-import ie.ncirl.container.manager.library.deployer.dto.Allocation;
-import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
+import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,13 +32,13 @@ import java.util.stream.Collectors;
  * Example
  * AWS -> 400,30 400,70   800,100
  * Azure -> 600,30 500,40   1100,70
- *
+ * <p>
  * 600,30 500,40 400,30 400,70 -> memSorted
  * 400,70 500,40 400,30 600,30 -> cpuSorted
- *
+ * <p>
  * AWS   -> 600,40 400,70 -> 1000,110
  * Azure -> 500,40 400,30 -> 900,80
- *
+ * <p>
  * AWS   -> 400,70 600,30  -> 1000 100
  * Azure ->
  */
@@ -49,17 +47,16 @@ import java.util.stream.Collectors;
 public class ZigZagOptimizer implements Optimizer {
 
     @Override
-    public AllocationData getAllocationData(List<VM> vms) throws ContainerException, DockerException {
-        List<Allocation> allocations = new ArrayList<>();
+    public List<OptimalContainer> getOptimalContainerData(List<VM> vms) throws ContainerException {
+        List<OptimalContainer> optimalContainers = new ArrayList<>();
 
         setApplicationResourceConsumption(vms);
         List<Container> containers = getAllContainersInVMs(vms);
 
-        if (containers.size() == 0) return AllocationData.builder().allocations(allocations).build();
+        if (containers.size() == 0) return optimalContainers;
 
         List<Container> cpuSortedContainers = getContainersSortedByCPU(containers);
         List<Container> memSortedContainers = getContainersSortedByMemory(containers);
-        int failedAllocations = containers.size(); // will be decremented when each container is allocated
 
         for (VM vm : vms) {
             int usedCpu = 0;
@@ -78,7 +75,7 @@ public class ZigZagOptimizer implements Optimizer {
                 if (forcePickCpuList && forcePickMemList) break;
 
                 List<Container> containerListToPick = cpuSortedContainers;
-                int percentUsedMemory = (usedMemory/availableMemory) * 100;
+                int percentUsedMemory = (usedMemory / availableMemory) * 100;
                 if ((forcePickMemList || usedCpu > percentUsedMemory) && !forcePickCpuList) {
                     containerListToPick = memSortedContainers;
                 }
@@ -99,19 +96,17 @@ public class ZigZagOptimizer implements Optimizer {
                 cpuSortedContainers.remove(container); // can look for improvements since this is O(n)
                 memSortedContainers.remove(container); // maybe use a mark and sweep like algorithm
 
-                Allocation allocation = Allocation.builder()
-                        .server(vm)
-                        .application(container.getApplication())
-                        .count(1)
+                OptimalContainer optimalContainer = OptimalContainer.builder()
+                        .optimalVM(vm)
+                        .container(container)
                         .build();
-                allocations.add(allocation);
+                optimalContainers.add(optimalContainer);
                 usedCpu += container.getCpu();
                 usedMemory += container.getMemory();
-                failedAllocations--;
             }
         }
 
-        return AllocationData.builder().allocations(allocations).failedAllocations(failedAllocations).build();
+        return optimalContainers;
     }
 
 
@@ -167,15 +162,15 @@ public class ZigZagOptimizer implements Optimizer {
      */
     private List<Container> getAllContainersInVMs(List<VM> vms) {
         return vms.stream().flatMap(
-                vm -> vm.getContainerDeployments().stream().map(containerDeployment -> {
-                    return Container.builder()
-                            .id(containerDeployment.getContainerId())
-                            .application(containerDeployment.getApplication())
-                            .server(vm)
-                            .cpu(containerDeployment.getApplication().getCpu())
-                            .memory(containerDeployment.getApplication().getMemory())
-                            .build();
-                })).collect(Collectors.toList());
+                vm -> vm.getContainerDeployments().stream().map(
+                        containerDeployment -> Container.builder()
+                                .id(containerDeployment.getContainerId())
+                                .application(containerDeployment.getApplication())
+                                .server(vm)
+                                .cpu(containerDeployment.getApplication().getCpu())
+                                .memory(containerDeployment.getApplication().getMemory())
+                                .build())
+        ).collect(Collectors.toList());
     }
 
 

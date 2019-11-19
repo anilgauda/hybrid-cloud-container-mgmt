@@ -24,7 +24,8 @@ public class SpreadAllocator implements AppAllocatorStrategy {
                     app -> app.equals(application)
             ).findAny();
 
-            if (!deployment.isPresent()) {
+            int allocatableContainersInVM = getAllocatableContainersInVM(application, server);
+            if (!deployment.isPresent() && allocatableContainersInVM > 0) {
                 pendingAllocations -= 1;
                 allocations.add(Allocation.builder().server(server).application(application).count(1).build());
             }

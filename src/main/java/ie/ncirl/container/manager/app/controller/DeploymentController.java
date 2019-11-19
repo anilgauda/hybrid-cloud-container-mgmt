@@ -80,7 +80,6 @@ public class DeploymentController {
 
         return "redirect:/deployapp";
     }
-
     /**
      * These are common attributes that are always added when showing deploy app page
      *
