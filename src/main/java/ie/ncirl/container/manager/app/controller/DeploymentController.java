@@ -73,7 +73,7 @@ public class DeploymentController {
         for (Allocation allocation : allocationData.getAllocations()) {
             deploymentService.deployContainers(allocation.getApplication(),
                     allocation.getServer(),
-                    Integer.parseInt(deploymentVo.getDeploymentType()));
+                    allocation.getCount());
         }
 
         redirectAttributes.addFlashAttribute("message", "Deployment created successfully");

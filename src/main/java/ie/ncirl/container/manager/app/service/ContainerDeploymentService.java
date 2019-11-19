@@ -16,6 +16,7 @@ import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 import ie.ncirl.container.manager.library.deployer.service.allocator.AppAllocator;
 import ie.ncirl.container.manager.library.deployer.service.allocator.FillAllocator;
 import ie.ncirl.container.manager.library.deployer.service.allocator.SpreadAllocator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
  * each docker in the given VM
  */
 @Service
+@Slf4j
 public class ContainerDeploymentService {
     @Autowired
     private
@@ -80,6 +82,8 @@ public class ContainerDeploymentService {
     }
 
     private void deployContainer(Application application, VM vm) {
+        log.debug(String.format("Deploying application [name:%s, uri:%s] in VM [id:%d name: %s]",
+                application.getName(), application.getRegistryImageUrl(), vm.getId(), vm.getName()));
         List<String> containerIds = new ArrayList<>();
         ContainerConfig config = new ContainerConfig();
         try {
@@ -87,6 +91,7 @@ public class ContainerDeploymentService {
                     application.getRegistryImageUrl());
         } catch (ContainerException e) {
             System.out.println("Error Occurred while creating container");
+            log.error("Error occurred while starting container", e);
         }
         for (String containerId : containerIds) {
             ContainerDeployment containerDeployment = ContainerDeployment.builder().containerId(containerId)

@@ -71,5 +71,6 @@ public class VM {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "vm")
     @Builder.Default
+    @ToString.Exclude
     private List<ContainerDeployment> containerDeployments = new ArrayList<>();
 }

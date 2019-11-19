@@ -8,11 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Builder
@@ -38,5 +34,6 @@ public class Application {
     private Integer memory = 0; // In MB of memory that app will use.. This is used in allocators
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ToString.Exclude
     private User user;
 }
