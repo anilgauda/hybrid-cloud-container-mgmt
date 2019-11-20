@@ -6,6 +6,7 @@ import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.constants.ContainerConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
+import ie.ncirl.container.manager.library.deployer.dto.Container;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 
 import java.util.*;
@@ -60,7 +61,7 @@ public class ZigZagOptimizer implements Optimizer {
 
         for (VM vm : vms) {
             int usedCpu = 0;
-            int usedMemory = 1;
+            int usedMemory = 1; //initially we want some value to be greater than the other
             int availableCpu = 100;
             int availableMemory = vm.getMemory();
 
@@ -179,7 +180,7 @@ public class ZigZagOptimizer implements Optimizer {
      *
      * @param vms VMs
      */
-    private void setApplicationResourceConsumption(List<VM> vms) throws ContainerException {
+    public void setApplicationResourceConsumption(List<VM> vms) throws ContainerException {
         ContainerConfig config = new ContainerConfig();
 
         for (VM vm : vms) {

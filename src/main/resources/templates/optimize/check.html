@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::section})}">
+<section class="container-fluid" th:fragment="content">
+    <div class="card shadow mb-4 col-lg-6" style="padding: 10px">
+        <div class="row col-lg-12">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Server name</th>
+                    <th>Memory before</th>
+                    <th>Memory after</th>
+                    <th>CPU before</th>
+                    <th>CPU after</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="optimization:${optimizations}">
+                    <td th:text="${optimization.vmName}">Name</td>
+                    <td th:text="${optimization.memoryBefore}">Memory before</td>
+                    <td th:text="${optimization.memoryAfter}">Memory after</td>
+                    <td th:text="${optimization.cpuBefore}">CPU before</td>
+                    <td th:text="${optimization.cpuAfter}">CPU after</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row col-lg-12">
+            <form action="#" method="post" th:action="@{/deploy/optimize}">
+                <span th:each="vmId:${vmIds}"><input type="hidden" name="vmIds" th:value="${vmId}"/></span>
+                <button class="btn btn-primary" href="/deploy/optimize">Optimize</button>
+                <a class="btn btn-light" href="/deploy/optimize">Cancel</a>
+            </form>
+        </div>
+    </div>
+</section>
+</html>

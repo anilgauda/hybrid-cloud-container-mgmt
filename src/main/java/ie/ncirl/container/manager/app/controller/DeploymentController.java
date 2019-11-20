@@ -13,14 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -80,6 +78,28 @@ public class DeploymentController {
 
         return "redirect:/deployapp";
     }
+
+    @GetMapping("/deploy/optimize")
+    public String showOptimizeView(Model model) {
+        model.addAttribute("vms", vmService.getAllVMs());
+        return "/optimize/view";
+    }
+
+    @PostMapping("/deploy/optimize/check")
+    public String showOptimizeCheckView(@RequestParam("vms") List<String> vmIds, Model model) {
+        model.addAttribute("optimizations", deploymentService.getOptimizationChanges(vmService.findByVmIds(vmIds)));
+        model.addAttribute("vmIds", vmIds);
+        return "/optimize/check";
+    }
+
+    @PostMapping("/deploy/optimize")
+    public String optimizeContainers(@RequestParam("vmIds") List<String> vmIds, Model model, RedirectAttributes redirectAttributes) {
+        deploymentService.optimizeContainers(vmService.findByVmIds(vmIds));
+        redirectAttributes.addFlashAttribute("message", "Containers/VMs optimized successfully");
+        return "redirect:/deploy/optimize";
+    }
+
+
     /**
      * These are common attributes that are always added when showing deploy app page
      *

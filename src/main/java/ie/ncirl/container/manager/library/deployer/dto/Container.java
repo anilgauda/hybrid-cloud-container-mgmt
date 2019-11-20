@@ -1,4 +1,4 @@
-package ie.ncirl.container.manager.library.deployer.service.optimizer;
+package ie.ncirl.container.manager.library.deployer.dto;
 
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.VM;

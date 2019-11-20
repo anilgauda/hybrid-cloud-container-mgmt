@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,6 +39,10 @@ public class VMService {
 
     public List<VMDTO> getAllVMs() {
         return converter.fromDomainList(vmRepo.findAll());
+    }
+
+    public List<VM> findByVmIds(List<String> vmIds) {
+        return vmRepo.findByIdIn(vmIds.stream().map(Long::new).collect(Collectors.toList()));
     }
 
     public VMDTO findByName(String name) {

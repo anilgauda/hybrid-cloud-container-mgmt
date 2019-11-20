@@ -43,8 +43,7 @@ TODO
   - Encryption of private keys
  
  
- -->> Bes 
- 
+
  
  # Design Pattern -> Converter Pattern, Strategy Pattern
  

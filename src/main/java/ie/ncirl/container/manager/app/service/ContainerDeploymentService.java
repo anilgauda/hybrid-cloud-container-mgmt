@@ -6,6 +6,7 @@ import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.repository.ContainerDeploymentRepo;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.DeploymentVo;
+import ie.ncirl.container.manager.app.vo.OptimizationVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
@@ -25,7 +26,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -104,7 +107,7 @@ public class ContainerDeploymentService {
      * Stops docker container in a VM and removes the ContainerDeployment object from db
      *
      * @param containerId Container id
-     * @param vm VM
+     * @param vm          VM
      */
     private void undeployContainer(String containerId, VM vm) {
         List<String> containerIds = new ArrayList<>();
@@ -186,8 +189,48 @@ public class ContainerDeploymentService {
         return optimalContainers;
     }
 
+
+    /**
+     * Gets before/after container changes in VMs
+     *
+     * @param vms VMs where optimization algorithm will run
+     */
+    public List<OptimizationVo> getOptimizationChanges(List<VM> vms) {
+        List<OptimalContainer> optimalContainers = getOptimalContainers(vms);
+        Map<String, OptimizationVo> optimizationMap = new HashMap<>();
+        ZigZagOptimizer optimizer = new ZigZagOptimizer();
+        try {
+            optimizer.setApplicationResourceConsumption(vms);
+        } catch (ContainerException e) {
+            log.error("Failed to allocate resources in vm containers", e);
+        }
+        for (VM vm : vms) {
+            int totalMemory = 0;
+            int totalCpu = 0;
+            for (ContainerDeployment containerDeployment : vm.getContainerDeployments()) {
+                totalMemory += containerDeployment.getApplication().getMemory();
+                totalCpu += containerDeployment.getApplication().getCpu();
+            }
+
+            optimizationMap.put(vm.getName(), OptimizationVo.builder()
+                    .vmName(vm.getName())
+                    .memoryBefore(totalMemory)
+                    .cpuBefore(totalCpu)
+                    .build());
+        }
+
+        for (OptimalContainer optimalContainer : optimalContainers) {
+            OptimizationVo vm = optimizationMap.get(optimalContainer.getOptimalVM().getName());
+            vm.setCpuAfter(vm.getCpuAfter() + optimalContainer.getContainer().getCpu());
+            vm.setMemoryAfter(vm.getMemoryAfter() + optimalContainer.getContainer().getMemory());
+        }
+
+        return new ArrayList<>(optimizationMap.values());
+    }
+
     /**
      * Optimizes all VMs by moving them optimally across VMs
+     *
      * @param vms VMs where optimization algorithm will run
      */
     public void optimizeContainers(List<VM> vms) {

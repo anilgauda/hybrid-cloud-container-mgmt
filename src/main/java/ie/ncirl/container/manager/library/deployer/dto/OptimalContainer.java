@@ -1,7 +1,6 @@
 package ie.ncirl.container.manager.library.deployer.dto;
 
 import ie.ncirl.container.manager.common.domain.VM;
-import ie.ncirl.container.manager.library.deployer.service.optimizer.Container;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

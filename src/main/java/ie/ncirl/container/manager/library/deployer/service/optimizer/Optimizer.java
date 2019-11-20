@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface Optimizer {
     List<OptimalContainer> getOptimalContainerData(List<VM> vms) throws ContainerException;
+    void setApplicationResourceConsumption(List<VM> vms) throws ContainerException;
 }
