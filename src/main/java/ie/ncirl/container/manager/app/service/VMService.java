@@ -104,4 +104,7 @@ public class VMService {
         }
         return listOfVmDto;
     }
+    public List<VM> findAllVmByUserId(Long userId){
+    	return vmRepo.findAllByUserId(userId);
+    } 
 }

@@ -1,5 +1,6 @@
 package ie.ncirl.container.manager.library.deployer.dto;
 
+import ie.ncirl.container.manager.app.dto.DTO;
 import ie.ncirl.container.manager.common.domain.VM;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @Builder
 @Data
 @EqualsAndHashCode
-public class OptimalContainer {
+public class OptimalContainer implements DTO{
 
     private Container container;
 

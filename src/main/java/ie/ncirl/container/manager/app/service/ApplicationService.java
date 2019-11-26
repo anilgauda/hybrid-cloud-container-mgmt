@@ -6,6 +6,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
@@ -50,7 +53,8 @@ public class ApplicationService {
 	public List<ApplicationVo> getRunningApplication() {
 		ContainerConfig config = new ContainerConfig();
 		List<ApplicationVo> applications = new ArrayList<>();
-		List<Application> listofApplication = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId());
+		Pageable firstFiveElements= PageRequest.of(0, 2);
+		Page<Application> listofApplication = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId(),firstFiveElements);
 		for (Application application : listofApplication) {
 			List<ContainerDeployment> containers = containerService.getContainersByAppId(application.getId());
 			if (containers.size() > 0) {
@@ -120,4 +124,9 @@ public class ApplicationService {
 	public void stopApplication(Long Id) {
 		containerService.deleteContainersByContainerId(Id);
 	}
+	
+	public List<Application> getAllApplicationByUserId(Long userId){
+		return applicationRepo.findAllByUserId(userId);
+	}
+	
 }

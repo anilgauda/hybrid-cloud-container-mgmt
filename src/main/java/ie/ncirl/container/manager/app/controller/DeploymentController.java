@@ -6,6 +6,7 @@ import ie.ncirl.container.manager.app.service.VMService;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.DeploymentVo;
 import ie.ncirl.container.manager.common.domain.enums.DeploymentType;
+import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 import lombok.extern.slf4j.Slf4j;
@@ -69,9 +70,13 @@ public class DeploymentController {
         log.info(String.format("Allocation data for deploying app %s is %s", appId, allocationData));
 
         for (Allocation allocation : allocationData.getAllocations()) {
-            deploymentService.deployContainers(allocation.getApplication(),
-                    allocation.getServer(),
-                    allocation.getCount());
+            try {
+				deploymentService.deployContainers(allocation.getApplication(),
+				        allocation.getServer(),
+				        allocation.getCount());
+			} catch (ContainerException e) {
+				log.error("Invalid Repository Name ",e);
+			}
         }
 
         redirectAttributes.addFlashAttribute("message", "Deployment created successfully");
@@ -94,7 +99,11 @@ public class DeploymentController {
 
     @PostMapping("/deploy/optimize")
     public String optimizeContainers(@RequestParam("vmIds") List<String> vmIds, Model model, RedirectAttributes redirectAttributes) {
-        deploymentService.optimizeContainers(vmService.findByVmIds(vmIds));
+        try {
+			deploymentService.optimizeContainers(vmService.findByVmIds(vmIds));
+		} catch (ContainerException e) {
+			log.error("Invalid Repository Name:",e);
+		}
         redirectAttributes.addFlashAttribute("message", "Containers/VMs optimized successfully");
         return "redirect:/deploy/optimize";
     }

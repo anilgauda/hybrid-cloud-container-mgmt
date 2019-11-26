@@ -25,7 +25,7 @@ public class VMConnection {
 		javaShell.setConfig(VMConstants.HOST_KEY_CHECK_CONFIG, VMConstants.HOST_KEY_CHECK_CONFIG_VALUE);
 		Session session = javaShell.getSession(userName, ipAddress, VMConstants.SSH_PORT);
 		try {
-			session.connect();
+			session.connect(60000);
 		} catch (JSchException sessionException) {
 			/** Close Connection when there is error while connecting to a session **/
 			session.disconnect();

@@ -123,11 +123,10 @@ public class VMConfig {
 			vmStatsMap.put(vmParametersFiltered.get(i), Integer.parseInt(vmValFiltered.get(i)));
 		}
 
-		vmStatsMap.forEach((k, v) -> System.out.println("Key :" + k + "  Value :" + v)); // Logger INFO
 		return vmStatsMap;
 	}
 
-	/*public static void main(String args[]) throws IOException, JSchException, DockerException {
+	public static void main(String args[]) throws IOException, JSchException, DockerException {
 		String keyPath = "D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem";
 		String vmUser = "ec2-user";
 		String publicIp = "54.154.27.111";
@@ -136,11 +135,9 @@ public class VMConfig {
 		byte[] prvKey=Files.readAllBytes(pkey);
 		VMConfig config = new VMConfig();
 		ArrayList<String> containerIDs=null;
-		
-		  String linuxDist =
-		  config.getLinuxDistribution(prvKey,vmUser,publicIp).get(0);
-		  System.out.println(Arrays.toString(prvKey));
-		 System.out.println("Current Linux Dist is :" + linuxDist); 
+		Map<String,Integer> vmMap=config.getVMStats(prvKey, vmUser, publicIp);
+		System.out.println("Memory Free: "+vmMap.get("free")+" Kb");
+		System.out.println("Cpu Free: "+vmMap.get("id")+" %");
 		 
 		 /*boolean
 		 isDockerInstalled=config.checkForDocker(keyPath, vmUser, publicIp); boolean
@@ -151,6 +148,6 @@ public class VMConfig {
 		
 		config.startContainers(keyPath, vmUser, publicIp, repoPath);
 		containerIDs=config.getContainerIds(keyPath, vmUser, publicIp);
-		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));
-	}*/
+		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));*/
+	}
 }

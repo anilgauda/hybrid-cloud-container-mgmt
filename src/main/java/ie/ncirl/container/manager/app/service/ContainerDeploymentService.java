@@ -1,5 +1,16 @@
 package ie.ncirl.container.manager.app.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ie.ncirl.container.manager.app.converters.OptimalContainerConvertor;
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
 import ie.ncirl.container.manager.app.converters.VMConverter;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
@@ -13,6 +24,11 @@ import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.common.domain.enums.DeploymentType;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
+import ie.ncirl.container.manager.library.configurevm.model.DeploymentModel;
+import ie.ncirl.container.manager.library.configurevm.strategy.ApplicationWeightedStrategy;
+import ie.ncirl.container.manager.library.configurevm.strategy.DeploymentStrategy;
+import ie.ncirl.container.manager.library.configurevm.strategy.VMWeightedStrategy;
+import ie.ncirl.container.manager.library.configurevm.strategy.WeightedStrategy;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import ie.ncirl.container.manager.library.deployer.service.allocator.AppAllocator;
@@ -21,15 +37,6 @@ import ie.ncirl.container.manager.library.deployer.service.allocator.SpreadAlloc
 import ie.ncirl.container.manager.library.deployer.service.optimizer.Optimizer;
 import ie.ncirl.container.manager.library.deployer.service.optimizer.ZigZagOptimizer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This class monitors all dockers in a given VM and returns required metrics
@@ -60,6 +67,9 @@ public class ContainerDeploymentService {
 
     @Autowired
     private VMConverter vmConverter;
+    
+    @Autowired
+    private OptimalContainerConvertor optimalConvertor;
 
     /**
      * Get the docker applications running in a VM
@@ -77,14 +87,15 @@ public class ContainerDeploymentService {
      * @param application    Application
      * @param vm             VM where docker application will be deployed
      * @param numDeployments Number of copies of this application to be deployed/started in the VM
+     * @throws ContainerException 
      */
-    public void deployContainers(Application application, VM vm, int numDeployments) {
+    public void deployContainers(Application application, VM vm, int numDeployments) throws ContainerException {
         while (numDeployments-- > 0) {
             deployContainer(application, vm);
         }
     }
 
-    private void deployContainer(Application application, VM vm) {
+    private void deployContainer(Application application, VM vm) throws ContainerException {
         log.debug(String.format("Deploying application [name:%s, uri:%s] in VM [id:%d name: %s]",
                 application.getName(), application.getRegistryImageUrl(), vm.getId(), vm.getName()));
         List<String> containerIds = new ArrayList<>();
@@ -93,13 +104,16 @@ public class ContainerDeploymentService {
             containerIds = config.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(),
                     application.getRegistryImageUrl());
         } catch (ContainerException e) {
-            System.out.println("Error Occurred while creating container");
             log.error("Error occurred while starting container", e);
         }
+        if(containerIds.size()>0) {
         for (String containerId : containerIds) {
             ContainerDeployment containerDeployment = ContainerDeployment.builder().containerId(containerId)
                     .application(application).vm(vm).deployedOn(LocalDateTime.now()).build();
             saveContainers(containerDeployment);
+        }
+        }else {
+        	throw new ContainerException("Public Repository name is incorrect", null);
         }
     }
 
@@ -232,12 +246,20 @@ public class ContainerDeploymentService {
      * Optimizes all VMs by moving them optimally across VMs
      *
      * @param vms VMs where optimization algorithm will run
+     * @throws ContainerException 
      */
-    public void optimizeContainers(List<VM> vms) {
+    public void optimizeContainers(List<VM> vms) throws ContainerException {
         List<OptimalContainer> optimalContainers = getOptimalContainers(vms);
-        for (OptimalContainer optimalContainer : optimalContainers) {
+        DeploymentStrategy strategy=new DeploymentStrategy();
+        
+        strategy.setStrategy(new ApplicationWeightedStrategy());
+        strategy.setStrategy(new VMWeightedStrategy());
+
+        strategy.execute(optimalConvertor.fromDTOList(optimalContainers), 50);// 50% need to be taken ass input
+        
+      /*  for (OptimalContainer optimalContainer : optimalContainers) {
             deployContainer(optimalContainer.getContainer().getApplication(), optimalContainer.getOptimalVM());
             undeployContainer(optimalContainer.getContainer().getId(), optimalContainer.getContainer().getServer());
-        }
+        }*/
     }
 }
