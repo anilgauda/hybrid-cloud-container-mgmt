@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html th:fragment="layout (content)" lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:fragment="layout (content)" lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:insert="fragments/header.html :: header">
 </head>
 <body id="page-top">
 <!-- Page Wrapper -->
 <div id="wrapper">
     <!-- Sidebar -->
-    <div th:insert="fragments/sidebar.html :: sidebar"></div>
+    <div sec:authorize="isAuthenticated()" th:insert="fragments/sidebar.html :: sidebar"></div>
     <!-- End of Sidebar -->
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
         <!-- Main Content -->
         <div id="content">
             <!-- Topbar -->
-            <div th:insert="fragments/navbar.html :: topbar"></div>
+            <div sec:authorize="isAuthenticated()" th:insert="fragments/navbar.html :: topbar"></div>
             <!-- End of Topbar -->
             <!-- Begin Page Content -->
             <div class="container-fluid" th:replace="${content}">
@@ -27,7 +27,7 @@
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>Copyright &copy; Your Website 2019</span>
+                    <span>Copyright &copy; Anil & Adesh 2019</span>
                 </div>
             </div>
         </footer>

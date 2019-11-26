@@ -12,14 +12,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Application {
-	 private Long id;
-	    private String name;
+    private Long id;
 
-	    private String registryImageUrl;
+    private String name;
 
-	    private Integer cpu = 0; // In % of total VM CPU predicted to be used.. This is used to optimize allocation
+    private String registryImageUrl;
 
-	    private Integer memory = 0; // In MB of memory that app will use.. This is used in allocators
+	@Builder.Default
+    private Integer cpu = 0; // In % of total VM CPU predicted to be used.. This is used to optimize allocation
 
-		
+	@Builder.Default
+    private Integer memory = 0; // In MB of memory that app will use.. This is used in allocators
 }

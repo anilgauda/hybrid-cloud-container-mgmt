@@ -15,6 +15,7 @@ public class DashBoardController {
 	
 	@RequestMapping(value = "/")
 	public String getHome(Model model) {
+
 		model.addAttribute("dashboardvo",dashboardService.getDashboardDetails());
 		return "index";
 	}

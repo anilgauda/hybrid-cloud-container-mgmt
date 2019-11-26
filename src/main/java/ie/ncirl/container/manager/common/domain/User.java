@@ -1,10 +1,7 @@
 package ie.ncirl.container.manager.common.domain;
 
 import ie.ncirl.container.manager.common.domain.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Table(name = "users")
 public class User {
 
