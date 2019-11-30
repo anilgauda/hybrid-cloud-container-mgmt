@@ -78,8 +78,13 @@ public class ApplicationController {
 	    public String deleteProvider(@PathVariable("id") String id,RedirectAttributes redirectAttributes) {
 	    	System.out.println("Delete Provider");
 	    	RegisterApplicationDto regApp=applicationService.getApplicationById(Long.parseLong(id));
-	    	applicationService.deleteApplicationById(Long.parseLong(id));
-	    	redirectAttributes.addFlashAttribute("delMessage", String.format("Application %s Deleted successfully", regApp.getName()));
+	    		try {
+					applicationService.deleteApplicationById(Long.parseLong(id));
+				} catch (Exception e) {
+			    	redirectAttributes.addFlashAttribute("delMessage", String.format("Unable to delete application %s containers are already running", regApp.getName()));
+			    	return "redirect:/applicationList";
+				}
+		    	redirectAttributes.addFlashAttribute("delMessage", String.format("Application %s Deleted successfully", regApp.getName()));
 			return "redirect:/applicationList";
 	      
 	    }

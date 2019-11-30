@@ -13,5 +13,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DeploymentModel {
 	 private Container container;
-	 private VM optimalVM;
+	 private VMModel optimalVM;
 }

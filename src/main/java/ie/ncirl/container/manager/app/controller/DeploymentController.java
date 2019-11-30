@@ -5,6 +5,7 @@ import ie.ncirl.container.manager.app.service.ContainerDeploymentService;
 import ie.ncirl.container.manager.app.service.VMService;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.DeploymentVo;
+import ie.ncirl.container.manager.common.domain.enums.AppDeployStrategy;
 import ie.ncirl.container.manager.common.domain.enums.DeploymentType;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.deployer.dto.Allocation;
@@ -76,6 +77,8 @@ public class DeploymentController {
 				        allocation.getCount());
 			} catch (ContainerException e) {
 				log.error("Invalid Repository Name ",e);
+				 redirectAttributes.addFlashAttribute("delMessage", e.getMessage());
+			      return "redirect:/deployapp";
 			}
         }
 
@@ -86,21 +89,25 @@ public class DeploymentController {
 
     @GetMapping("/deploy/optimize")
     public String showOptimizeView(Model model) {
-        model.addAttribute("vms", vmService.getAllVMs());
+        model.addAttribute("vms", vmService.findAllVmByUserId(userUtil.getCurrentUser().getId()));
+        model.addAttribute("strategy",Arrays.asList(AppDeployStrategy.values()));
         return "/optimize/view";
     }
 
     @PostMapping("/deploy/optimize/check")
-    public String showOptimizeCheckView(@RequestParam("vms") List<String> vmIds, Model model) {
+    public String showOptimizeCheckView(@RequestParam("vms") List<String> vmIds, @RequestParam("deploymentStrategy") String strategy,@RequestParam("weight") String weight,Model model) {
         model.addAttribute("optimizations", deploymentService.getOptimizationChanges(vmService.findByVmIds(vmIds)));
         model.addAttribute("vmIds", vmIds);
+        model.addAttribute("deploymentStrategy",strategy);
+        model.addAttribute("weight",weight);
+
         return "/optimize/check";
     }
 
     @PostMapping("/deploy/optimize")
-    public String optimizeContainers(@RequestParam("vmIds") List<String> vmIds, Model model, RedirectAttributes redirectAttributes) {
+    public String optimizeContainers(@RequestParam("vmIds") List<String> vmIds,@RequestParam("deploymentStrategy") String strategy,@RequestParam("weight") String weight, Model model, RedirectAttributes redirectAttributes) {
         try {
-			deploymentService.optimizeContainers(vmService.findByVmIds(vmIds));
+			deploymentService.optimizeContainers(vmService.findByVmIds(vmIds),Integer.parseInt(strategy),Integer.parseInt(weight));
 		} catch (ContainerException e) {
 			log.error("Invalid Repository Name:",e);
 		}

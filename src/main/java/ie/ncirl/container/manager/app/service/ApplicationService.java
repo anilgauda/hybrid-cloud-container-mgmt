@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
+import ie.ncirl.container.manager.app.exception.ApplicationException;
 import ie.ncirl.container.manager.app.repository.ApplicationRepo;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.ApplicationVo;
@@ -26,38 +27,55 @@ import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import lombok.extern.slf4j.Slf4j;
 
+
 @Slf4j
 @Service
 public class ApplicationService {
 
+	/** The logger. */
 	Logger logger = LoggerFactory.getLogger(ApplicationService.class);
 
+	/** The vm service. */
 	@Autowired
 	private VMService vmService;
 
+	/** The provider service. */
 	@Autowired
 	private ProviderService providerService;
 
+	/** The application repo. */
 	@Autowired
 	private ApplicationRepo applicationRepo;
 
+	/** The container service. */
 	@Autowired
 	private ContainerDeploymentService containerService;
 
+	/** The user utility */
 	@Autowired
 	UserUtil userUtil;
 
+	/** The convertor. */
 	@Autowired
 	private RegisterApplicationConvertor convertor;
 
+	
+	/**
+	 * Gets the all the running applications from application tables and fetch there
+	 * stats from running virtual machine.
+	 *
+	 * @return the running application
+	 */
 	public List<ApplicationVo> getRunningApplication() {
 		ContainerConfig config = new ContainerConfig();
 		List<ApplicationVo> applications = new ArrayList<>();
-		Pageable firstFiveElements= PageRequest.of(0, 2);
-		Page<Application> listofApplication = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId(),firstFiveElements);
+		Pageable firstFiveElements = PageRequest.of(0, 2);
+		/**Get all the running container from  application repo**/
+		Page<Application> listofApplication = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId(), firstFiveElements);
 		for (Application application : listofApplication) {
 			List<ContainerDeployment> containers = containerService.getContainersByAppId(application.getId());
 			if (containers.size() > 0) {
+				/** Create applicationvo to display it on page**/
 				ApplicationVo applicationVo = new ApplicationVo();
 				List<ContainerVo> containersVo = new ArrayList<>();
 				applicationVo.setAppId(application.getId());
@@ -72,7 +90,7 @@ public class ApplicationService {
 					try {
 						containerVo.setStats(config.getContainerStats(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), container.getContainerId()));
 					} catch (ContainerException e) {
-						System.out.println("Error Occured While fetching container stats");
+						logger.error("Error Occured While fetching container stats");
 					}
 					containersVo.add(containerVo);
 				}
@@ -84,6 +102,11 @@ public class ApplicationService {
 		return applications;
 	}
 
+	/**
+	 * Save application.
+	 *
+	 * @param regApplication the registered application
+	 */
 	public void saveApplication(RegisterApplicationDto regApplication) {
 		Application application = convertor.from(regApplication);
 		User user = userUtil.getCurrentUser();
@@ -92,6 +115,11 @@ public class ApplicationService {
 		applicationRepo.save(application);
 	}
 
+	/**
+	 * Gets the applications by user.
+	 *
+	 * @return the applications by user
+	 */
 	public List<RegisterApplicationDto> getApplicationsByUser() {
 		List<RegisterApplicationDto> registeredApplcationList = new ArrayList<>();
 		List<Application> applications = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId());
@@ -101,6 +129,12 @@ public class ApplicationService {
 		return registeredApplcationList;
 	}
 
+	/**
+	 * Gets the application by name.
+	 *
+	 * @param name the name
+	 * @return the application by name
+	 */
 	public RegisterApplicationDto getApplicationByName(String name) {
 		Application application = applicationRepo.findByName(name);
 		if (application != null) {
@@ -109,6 +143,12 @@ public class ApplicationService {
 		return null;
 	}
 
+	/**
+	 * Gets the application by id.
+	 *
+	 * @param id the id
+	 * @return the application by id
+	 */
 	public RegisterApplicationDto getApplicationById(Long id) {
 		Application application = applicationRepo.getOne(id);
 		if (application != null) {
@@ -117,16 +157,39 @@ public class ApplicationService {
 		return null;
 	}
 
-	public void deleteApplicationById(Long id) {
+	/**
+	 * Delete application by id.
+	 *
+	 * @param id the id
+	 * @throws ApplicationException 
+	 */
+	public void deleteApplicationById(Long id) throws ApplicationException {
+		List<ContainerDeployment> runningContainers=containerService.getContainersByAppId(id);
+		if(runningContainers.size()>0) {
 		applicationRepo.deleteById(id);
+		}else {
+			throw new ApplicationException("Unable to Delete Application Please delete the stop the containers");
+		}
 	}
 
+
+	/**
+	 * Stop application.
+	 *
+	 * @param Id the id
+	 */
 	public void stopApplication(Long Id) {
 		containerService.deleteContainersByContainerId(Id);
 	}
-	
-	public List<Application> getAllApplicationByUserId(Long userId){
+
+	/**
+	 * Gets the all application by user id.
+	 *
+	 * @param userId the user id
+	 * @return the all application by user id
+	 */
+	public List<Application> getAllApplicationByUserId(Long userId) {
 		return applicationRepo.findAllByUserId(userId);
 	}
-	
+
 }

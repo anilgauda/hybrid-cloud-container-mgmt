@@ -1,9 +1,6 @@
 package ie.ncirl.container.manager.library.configurevm;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,12 +13,29 @@ import com.jcraft.jsch.JSchException;
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 
-public class ContainerConfig {
-	VMConnection connection = new VMConnection();
+/**
+ * The Class ContainerConfig.
+ *
+ * @author Anil
+ */
 
-	/***************
+public class ContainerConfig {
+	
+	/** The connection. */
+	VMConnection connection=VMConnection.getConnection();
+	
+	/**
+	 * *************
 	 * Method to get Map of Container Stats properties
-	 ***********************/
+	 * *********************.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @param containerID the container ID
+	 * @return the container stats
+	 * @throws ContainerException the container exception
+	 */
 	public Map<String, String> getContainerStats(byte[] privateKey, String userName, String ipAddress, String containerID) throws ContainerException {
 		ArrayList<String> containerStats = new ArrayList<>();
 		Map<String, String> containerStatsMap = new HashMap<>();
@@ -60,6 +74,16 @@ public class ContainerConfig {
 		return containerStatsMap;
 	}
 
+	/**
+	 * Stop containers.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @param containerIds the container ids
+	 * @return the list
+	 * @throws ContainerException the container exception
+	 */
 	public List<String> stopContainers(byte[] privateKey, String userName, String ipAddress, List<String> containerIds) throws ContainerException {
 		String containerId = new String();
 		List<String> listOfContainersStopped = new ArrayList<>();
@@ -75,6 +99,16 @@ public class ContainerConfig {
 		return listOfContainersStopped;
 	}
 
+	/**
+	 * Start containers.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @param repoPath the repo path
+	 * @return the list
+	 * @throws ContainerException the container exception
+	 */
 	public List<String> startContainers(byte[] privateKey, String userName, String ipAddress, String repoPath) throws ContainerException {
 		List<String> containerIds = new ArrayList<>();
 		try {
@@ -92,9 +126,24 @@ public class ContainerConfig {
 		return containerIds;
 	}
 
-	/***************
+	/**
+	 * *************
 	 * Method to get List of containers Running in a vm
-	 ***********************/
+	 * *********************.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @return the container ids
+	 * @throws ContainerException the container exception
+	 */
+	/**
+	 * @param privateKey
+	 * @param userName
+	 * @param ipAddress
+	 * @return
+	 * @throws ContainerException
+	 */
 	public ArrayList<String> getContainerIds(byte[] privateKey, String userName, String ipAddress) throws ContainerException {
 		ArrayList<String> containerIds = new ArrayList<>();
 		try {
@@ -104,9 +153,19 @@ public class ContainerConfig {
 		}
 		return containerIds;
 	}
-	/***************
+	
+	/**
+	 * *************
 	 * Method to get List of containers Running in a vm by reponame
-	 ***********************/
+	 * *********************.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @param repoName the repo name
+	 * @return the container ids
+	 * @throws ContainerException the container exception
+	 */
 	public ArrayList<String> getContainerIds(byte[] privateKey, String userName, String ipAddress,String repoName) throws ContainerException {
 		ArrayList<String> containerIds = new ArrayList<>();
 		try {
@@ -115,28 +174,5 @@ public class ContainerConfig {
 			throw new ContainerException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
 		return containerIds;
-	}
-	public static void main(String args[]) throws  ContainerException, IOException {
-		String keyPath = "D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem";
-		String vmUser = "ec2-user";
-		String publicIp = "54.154.27.111";
-		String repoPath = "anil2993/tomcat";
-		Path pkey=Paths.get(keyPath);
-		byte[] prvKey=Files.readAllBytes(pkey);
-		ContainerConfig config = new ContainerConfig();
-		ArrayList<String> containerIDs=null;
-		 containerIDs=config.getContainerIds(prvKey,vmUser,publicIp,repoPath);
-		 containerIDs.forEach(s -> System.out.println("Container Running :"+s));
-		 
-		 /*boolean
-		 isDockerInstalled=config.checkForDocker(keyPath, vmUser, publicIp); boolean
-		  isDockerStarted=config.checkForDockerService(keyPath, vmUser, publicIp);
-		  if(!isDockerInstalled) { config.installDocker(keyPath, vmUser, publicIp,
-		  linuxDist); } if(!isDockerStarted) { config.startDockerService(keyPath,
-		  vmUser, linuxDist); }
-		
-		config.startContainers(keyPath, vmUser, publicIp, repoPath);
-		containerIDs=config.getContainerIds(keyPath, vmUser, publicIp);
-		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));*/
 	}
 }

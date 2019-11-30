@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ie.ncirl.container.manager.app.converters.ModelAppConvertor;
+import ie.ncirl.container.manager.app.converters.ModelVMConvertor;
 import ie.ncirl.container.manager.app.converters.OptimalContainerConvertor;
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
 import ie.ncirl.container.manager.app.converters.VMConverter;
@@ -21,14 +23,15 @@ import ie.ncirl.container.manager.app.vo.OptimizationVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
+import ie.ncirl.container.manager.common.domain.enums.AppDeployStrategy;
 import ie.ncirl.container.manager.common.domain.enums.DeploymentType;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
-import ie.ncirl.container.manager.library.configurevm.model.DeploymentModel;
+import ie.ncirl.container.manager.library.configurevm.model.Container;
+import ie.ncirl.container.manager.library.configurevm.model.ContainersList;
 import ie.ncirl.container.manager.library.configurevm.strategy.ApplicationWeightedStrategy;
 import ie.ncirl.container.manager.library.configurevm.strategy.DeploymentStrategy;
 import ie.ncirl.container.manager.library.configurevm.strategy.VMWeightedStrategy;
-import ie.ncirl.container.manager.library.configurevm.strategy.WeightedStrategy;
 import ie.ncirl.container.manager.library.deployer.dto.AllocationData;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import ie.ncirl.container.manager.library.deployer.service.allocator.AppAllocator;
@@ -70,6 +73,12 @@ public class ContainerDeploymentService {
     
     @Autowired
     private OptimalContainerConvertor optimalConvertor;
+    
+    @Autowired
+    private ModelAppConvertor modelAppConvertor;
+    
+    @Autowired
+    private ModelVMConvertor modelVMConvertor;
 
     /**
      * Get the docker applications running in a VM
@@ -125,14 +134,7 @@ public class ContainerDeploymentService {
      */
     private void undeployContainer(String containerId, VM vm) {
         List<String> containerIds = new ArrayList<>();
-        containerIds.add(containerId);
-        ContainerConfig config = new ContainerConfig();
-        try {
-            config.stopContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(),
-                    containerIds);
-        } catch (ContainerException e) {
-            log.error("Error occurred while stopping container", e);
-        }
+        containerIds.add(containerId);      
         containerRepo.deleteByContainerId(containerId);
     }
 
@@ -157,7 +159,7 @@ public class ContainerDeploymentService {
         containerRepo.deleteByApplicationId(appId);
     }
 
-    List<ContainerDeployment> getContainersByAppId(Long appId) {
+    public List<ContainerDeployment> getContainersByAppId(Long appId) {
         return containerRepo.findAllByApplicationId(appId);
     }
 
@@ -246,20 +248,41 @@ public class ContainerDeploymentService {
      * Optimizes all VMs by moving them optimally across VMs
      *
      * @param vms VMs where optimization algorithm will run
+     * @param j 
+     * @param i 
      * @throws ContainerException 
      */
-    public void optimizeContainers(List<VM> vms) throws ContainerException {
+    public void optimizeContainers(List<VM> vms, int strategyCode, int weight) throws ContainerException {
         List<OptimalContainer> optimalContainers = getOptimalContainers(vms);
         DeploymentStrategy strategy=new DeploymentStrategy();
         
-        strategy.setStrategy(new ApplicationWeightedStrategy());
-        strategy.setStrategy(new VMWeightedStrategy());
-
-        strategy.execute(optimalConvertor.fromDTOList(optimalContainers), 50);// 50% need to be taken ass input
-        
-      /*  for (OptimalContainer optimalContainer : optimalContainers) {
-            deployContainer(optimalContainer.getContainer().getApplication(), optimalContainer.getOptimalVM());
-            undeployContainer(optimalContainer.getContainer().getId(), optimalContainer.getContainer().getServer());
-        }*/
+        switch (AppDeployStrategy.fromCode(strategyCode)) {
+        case ApplicationWeighted:
+        	strategy.setStrategy(new ApplicationWeightedStrategy());
+            break;
+        case VMWeighted:
+        	strategy.setStrategy(new VMWeightedStrategy());
+            break;
     }
+        ContainersList containerLists= strategy.execute(optimalConvertor.fromDTOList(optimalContainers), weight);
+        List<Container> deployedContainers=containerLists.getDeployedContainers();
+        List<Container> unDeployedContainers=containerLists.getUndeployedContainers();
+        System.out.println("Containers to be Deployed"+deployedContainers.toString());
+        System.out.println("Containers to be Undeployed"+unDeployedContainers.toString());
+        for(Container container: deployedContainers) {
+            deployContainer(container.getId(),modelAppConvertor.from(container.getApplication()),modelVMConvertor.from( container.getServer()));
+
+        }
+        for(Container container: unDeployedContainers) {
+        	undeployContainer(container.getId(), modelVMConvertor.from(container.getServer()));
+
+        }
+    }
+
+	private void deployContainer(String containerID, Application application, VM vm) {
+		ContainerDeployment containerDeployment = ContainerDeployment.builder().containerId(containerID)
+                .application(application).vm(vm).deployedOn(LocalDateTime.now()).build();
+        saveContainers(containerDeployment);
+		
+	}
 }

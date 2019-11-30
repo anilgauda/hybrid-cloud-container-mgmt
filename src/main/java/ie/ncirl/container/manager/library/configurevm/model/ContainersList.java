@@ -1,5 +1,7 @@
 package ie.ncirl.container.manager.library.configurevm.model;
 
+import java.util.ArrayList;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,14 +10,10 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class VM {
-	 private Long id;
-	    private String name;
-	    private String host;
-	    private String username;
-	    private byte[] privateKey;
-		
+@Builder
+public class ContainersList {
+ ArrayList<Container> deployedContainers;
+ ArrayList<Container> undeployedContainers;
 }

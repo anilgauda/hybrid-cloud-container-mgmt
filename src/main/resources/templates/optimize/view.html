@@ -1,18 +1,32 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: layout(~{::section})}">
+	th:replace="~{fragments/layout :: layout(~{::section})}">
 <section class="container-fluid" th:fragment="content">
-    <div th:if="${message}" th:text="${message}" class="alert alert-success"/>
-    <div class="card shadow mb-4 col-lg-6" style="padding: 10px">
-        <form action="#" method="post" th:action="@{/deploy/optimize/check}">
-            <div class="form-group">
-                <label for="vms">Select servers to optimize</label>
-                <select class="form-control" required="required" name="vms" id="vms" multiple>
-                    <option th:each="vm : ${vms}" th:value="${vm.id}" th:text="${vm.name}"></option>
-                </select>
-            </div>
-            <button id="check" class="btn btn-success" href="/deploy/optimize/check">Check optimization</button>
-        </form>
-    </div>
+	<div th:if="${message}" th:text="${message}" class="alert alert-success" />
+	<div class="card shadow mb-4 col-lg-6" style="padding: 10px">
+		<form action="#" method="post" th:action="@{/deploy/optimize/check}">
+			<div class="form-group">
+				<label for="vms">Select servers to optimize</label> <select class="form-control"
+					required="required" name="vms" id="vms" multiple>
+					<option th:each="vm : ${vms}" th:value="${vm.id}" th:text="${vm.name}"></option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="provider">Select Strategy</label> <select class="form-control"
+					name="deploymentStrategy" id="deploymentStrategy" required="required">
+					<option value="deploymentStrategy" disabled="disabled" selected="selected">-- Select a
+						Strategy--</option>
+					<option th:each="type : ${strategy}" th:value="${type.getCode()}" th:text="${type.name()}"></option>
+				</select>
+			</div>
+			<div class="form-group">
+			<label>Enter Weight in Percent</label> 
+			<input type="number" class="form-control form-control-user" id="weight" name="weight"
+										placeholder="Enter Number in percent" required="required">
+			</div>
+			<button id="check" class="btn btn-success" href="/deploy/optimize/check">Check
+				optimization</button>
+		</form>
+	</div>
 </section>
 </html>

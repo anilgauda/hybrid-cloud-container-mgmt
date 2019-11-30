@@ -10,27 +10,40 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
-import ie.ncirl.container.manager.library.configurevm.model.Application;
+import ie.ncirl.container.manager.library.configurevm.model.ApplicationModel;
 import ie.ncirl.container.manager.library.configurevm.model.Container;
+import ie.ncirl.container.manager.library.configurevm.model.ContainersList;
 import ie.ncirl.container.manager.library.configurevm.model.DeploymentModel;
-import ie.ncirl.container.manager.library.configurevm.model.VM;
+import ie.ncirl.container.manager.library.configurevm.model.VMModel;
+
 
 public class VMWeightedStrategy implements WeightedStrategy {
+	
 	public static Logger logger = Logger.getLogger(VMWeightedStrategy.class.getName());
 
+	/**
+	 * Deploy Application taking number of Virtual machine on which is to be deployed as a baseline to calculate the weight.
+	 *
+	 * @param deploymentList the deployment list
+	 * @param weightInPercent the weight in percent
+	 * @return the containers list
+	 */
 	@Override
-	public void deploy(List<DeploymentModel> deploymentList, int weightInPercent) {
+	public ContainersList deploy(List<DeploymentModel> deploymentList, int weightInPercent) {
 		ContainerConfig containerConfig = new ContainerConfig();
 		Map<String, Integer> vmAppMap = new HashMap<>();
-		Map<String,VM> vmMap=new HashMap<>();
-		Map<String, Queue<Application>> appVMMap = new HashMap<>();
-		Map<String,Queue<VM>> appVMUndeployMap =new HashMap<>();
+		Map<String,VMModel> vmMap=new HashMap<>();
+		Map<String, Queue<ApplicationModel>> appVMMap = new HashMap<>();
+		Map<String,Queue<VMModel>> appVMUndeployMap =new HashMap<>();
 		Map<String,Queue<String>> appContainerMap= new HashMap<>();
+		ArrayList<Container> deployedContainers=new ArrayList<>();
+		ArrayList<Container> unDeployedContainers =new ArrayList<>();
 		
+		ContainersList containerList=new ContainersList();
 		for (DeploymentModel model : deploymentList) {
 			Container container = model.getContainer();
-			Application app = container.getApplication();
-			VM deployVM = model.getOptimalVM();
+			ApplicationModel app = container.getApplication();
+			VMModel deployVM = model.getOptimalVM();
 			String vmName = deployVM.getName();
 
 			if (vmAppMap.containsKey(vmName)) {
@@ -41,21 +54,21 @@ public class VMWeightedStrategy implements WeightedStrategy {
 			}
 
 			if (appVMMap.containsKey(vmName)) {
-				Queue<Application> deployList = appVMMap.get(vmName);
+				Queue<ApplicationModel> deployList = appVMMap.get(vmName);
 				deployList.add(app);
 				appVMMap.put(vmName, deployList);
 			} else {
-				Queue<Application> deployList = new LinkedList<>();
+				Queue<ApplicationModel> deployList = new LinkedList<>();
 				deployList.add(app);
 				appVMMap.put(vmName, deployList);
 			}
 			
 			if (appVMUndeployMap.containsKey(app.getRegistryImageUrl())) {
-				Queue<VM> unDeployList = appVMUndeployMap.get(app.getRegistryImageUrl());
+				Queue<VMModel> unDeployList = appVMUndeployMap.get(app.getRegistryImageUrl());
 				unDeployList.add(container.getServer());
 				appVMUndeployMap.put(app.getRegistryImageUrl(), unDeployList);
 			} else {
-				Queue<VM> unDeployList = new LinkedList<>();
+				Queue<VMModel> unDeployList = new LinkedList<>();
 				unDeployList.add(container.getServer());
 				appVMUndeployMap.put(app.getRegistryImageUrl(), unDeployList);
 			}
@@ -70,17 +83,25 @@ public class VMWeightedStrategy implements WeightedStrategy {
 				appContainerMap.put(app.getRegistryImageUrl(), containerIds);
 			}
 		}
-		System.out.println("before Weighted Deployment map: "+vmAppMap.toString());
+		System.out.println("Undeploy map");
+		appVMUndeployMap.forEach((key,value)-> {
+			System.out.println("Key :"+key+" value: "+value);
+		});
 		vmAppMap.forEach((key,value) -> {
+			
 			logger.log(Level.INFO,String.format(" Weighted VM Statergy key: %s value: %s",key,value));
+			/** Calculate the Number of server that is to be deployed first **/
 			double numberOfVm = Math.ceil((float) (value.floatValue() * (weightInPercent / 100.0)));
-			System.out.println("Number of servers to deploy"+numberOfVm);
 			for (int i = 0; i < numberOfVm; i++) {
-				Application app = appVMMap.get(key).poll();
-				VM vm =vmMap.get(key);
+				Container deployedContainer=new Container();
+				Container unDeployedContainer=new Container();
+				ApplicationModel app = appVMMap.get(key).poll();
+				VMModel vm =vmMap.get(key);
 				if (vm != null) {
 					try {
-						containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), app.getRegistryImageUrl());
+						deployedContainer.setId(containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), app.getRegistryImageUrl()).get(0));
+						deployedContainer.setServer(vm);
+						deployedContainer.setApplication(app);
 					} catch (Exception e) {
 						logger.log(Level.SEVERE, "Error Occured While Starting Container");
 					}
@@ -92,11 +113,16 @@ public class VMWeightedStrategy implements WeightedStrategy {
 						List<String>containerIDs=new ArrayList<>();
 						containerIDs.add(containerId);
 						containerConfig.stopContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(),containerIDs);
+						unDeployedContainer.setId(containerId);
+						unDeployedContainer.setServer(vm);
+						unDeployedContainer.setApplication(app);
 					} catch (Exception e) {
 						logger.log(Level.SEVERE, "Error Occured While Starting Container");
 					}
 				}
 				vmAppMap.put(key, vmAppMap.get(key)-1);
+				deployedContainers.add(deployedContainer);
+				unDeployedContainers.add(unDeployedContainer);
 			}
 			
 		});
@@ -107,15 +133,19 @@ public class VMWeightedStrategy implements WeightedStrategy {
 		} catch (InterruptedException e1) {
 			
 		}
-		System.out.println("after Weighted Deployment map: "+vmAppMap.toString());
+		logger.log(Level.INFO, String.format("current map val after calc: %s", vmAppMap.toString()));
 
 		vmAppMap.forEach((key,value) -> {
 			for (int i = 0; i < value; i++) {
-				Application app = appVMMap.get(key).poll();
-				VM vm =vmMap.get(key);
+				Container deployedContainer=new Container();
+				Container unDeployedContainer=new Container();
+				ApplicationModel app = appVMMap.get(key).poll();
+				VMModel vm =vmMap.get(key);
 				if (vm != null) {
 					try {
-						containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), app.getRegistryImageUrl());
+						deployedContainer.setId(containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), app.getRegistryImageUrl()).get(0));
+						deployedContainer.setServer(vm);
+						deployedContainer.setApplication(app);
 					} catch (Exception e) {
 						logger.log(Level.SEVERE, "Error Occured While Starting Container");
 					}
@@ -127,12 +157,20 @@ public class VMWeightedStrategy implements WeightedStrategy {
 						List<String>containerIDs=new ArrayList<>();
 						containerIDs.add(containerId);
 						containerConfig.stopContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(),containerIDs);
+						unDeployedContainer.setId(containerId);
+						unDeployedContainer.setServer(vm);
+						unDeployedContainer.setApplication(app);
 					} catch (Exception e) {
 						logger.log(Level.SEVERE, "Error Occured While Starting Container");
 					}
 				}
+				deployedContainers.add(deployedContainer);
+				unDeployedContainers.add(unDeployedContainer);
 			}
 		});
+		containerList.setDeployedContainers(deployedContainers);
+		containerList.setUndeployedContainers(unDeployedContainers);
+		return containerList;
 	}
 
 }

@@ -1,14 +1,12 @@
 package ie.ncirl.container.manager.library.configurevm;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,9 +15,22 @@ import com.jcraft.jsch.JSchException;
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 
-public class VMConfig {
-	VMConnection connection=new VMConnection();
 
+public class VMConfig {
+	
+	Logger logger= Logger.getLogger(VMConfig.class.getName());
+	/** The connection. */
+	VMConnection connection=VMConnection.getConnection();
+
+	/**
+	 * Gets the linux distribution.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @return the linux distribution
+	 * @throws DockerException the docker exception
+	 */
 	public String getLinuxDistribution( byte[] privateKey, String userName, String ipAddress) throws DockerException {
 		ArrayList<String> result = new ArrayList<>();
 		try {
@@ -37,6 +48,15 @@ public class VMConfig {
 		return result.get(0);
 	}
 
+	/**
+	 * Install docker.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @param linuxDist the linux dist
+	 * @throws DockerException the docker exception
+	 */
 	public void installDocker(byte[] privateKey, String userName, String ipAddress, String linuxDist) throws DockerException {
 		try {
 			if (linuxDist.contains(VMConstants.OS_FEDORA)) {
@@ -49,6 +69,14 @@ public class VMConfig {
 		}
 	}
 
+	/**
+	 * Start docker service.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @throws DockerException the docker exception
+	 */
 	public void startDockerService(byte[] privateKey, String userName, String ipAddress) throws DockerException {
 		try {
 			connection.executeCommand(privateKey, userName, ipAddress, VMConstants.START_DOCKER_SERVICE);
@@ -57,6 +85,15 @@ public class VMConfig {
 		}
 	}
 
+	/**
+	 * Check for docker.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @return true, if successful
+	 * @throws DockerException the docker exception
+	 */
 	public boolean checkForDocker(byte[] privateKey, String userName, String ipAddress) throws DockerException {
 		// Check if docker is installed or not
 		ArrayList<String> result = null;
@@ -66,12 +103,21 @@ public class VMConfig {
 		} catch (JSchException | IOException e) {
 			throw new DockerException(VMConstants.DOCKER_MISSING_MSG, e);
 		}
-		if (result.isEmpty()) {// Need to use Regex for matching
+		if (result.isEmpty()) {
 			isDockerInstalled = false;
 		}
 		return isDockerInstalled;
 	}
 
+	/**
+	 * Check for docker service.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @return true, if successful
+	 * @throws DockerException the docker exception
+	 */
 	public boolean checkForDockerService(byte[] privateKey, String userName, String ipAddress) throws DockerException {
 		ArrayList<String> result = null;
 		boolean isDockerServiceRunning = true;
@@ -81,16 +127,24 @@ public class VMConfig {
 		} catch (JSchException | IOException e) {
 			throw new DockerException(VMConstants.DOCKER_SERVICE_NOT_RUNNING_MSG, e);
 		}
-		if (!result.isEmpty() && result.get(0) != null && result.get(0).contains("inactive")) {// Need to use Regex for matching
+		if (!result.isEmpty() && result.get(0) != null && result.get(0).contains("inactive")) {
 			isDockerServiceRunning = false;
 		}
 
 		return isDockerServiceRunning;
 	}
 
-	/***************
+	/**
+	 * *************
 	 * Method to get Map of virtual machine system properties
-	 ***********************/
+	 * *********************.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @return the VM stats
+	 * @throws DockerException the docker exception
+	 */
 	public Map<String, Integer> getVMStats(byte[] privateKey, String userName, String ipAddress) throws DockerException {
 		ArrayList<String> vmStats = new ArrayList<>();
 		try {
@@ -98,8 +152,8 @@ public class VMConfig {
 		} catch (JSchException | IOException e) {
 			throw new DockerException(VMConstants.DOCKER_START_FAILED_MSG, e);
 		}
-		System.out.println(vmStats.get(1));// Logger INFO
-		System.out.println(vmStats.get(2));// Logger INFO
+		logger.log(Level.INFO, String.format("Stats Keys %s", vmStats.get(1)));
+		logger.log(Level.INFO, String.format("Stats values %s", vmStats.get(2)));
 		String[] vmParameters = vmStats.get(1).split(" ");
 		String[] vmVal = vmStats.get(2).split(" ");
 
@@ -117,37 +171,13 @@ public class VMConfig {
 				vmValFiltered.add(val);
 			}
 		}
-		System.out.println("Length of the keys array" + vmParametersFiltered.size()); // Logger INFO
-		System.out.println("Length of the val array" + vmValFiltered.size()); // Logger INFO
+		logger.log(Level.INFO, String.format("Length of the keys array %s", vmParametersFiltered.size()));
+		logger.log(Level.INFO, String.format("Length of the val array %s", vmValFiltered.size()));
+
 		for (int i = 0; i < vmParametersFiltered.size(); i++) {
 			vmStatsMap.put(vmParametersFiltered.get(i), Integer.parseInt(vmValFiltered.get(i)));
 		}
 
 		return vmStatsMap;
-	}
-
-	public static void main(String args[]) throws IOException, JSchException, DockerException {
-		String keyPath = "D:\\Workspace\\AWS_keypair\\x18180663_keypair.pem";
-		String vmUser = "ec2-user";
-		String publicIp = "54.154.27.111";
-		String repoPath = "anil2993/tomcat";
-		Path pkey=Paths.get(keyPath);
-		byte[] prvKey=Files.readAllBytes(pkey);
-		VMConfig config = new VMConfig();
-		ArrayList<String> containerIDs=null;
-		Map<String,Integer> vmMap=config.getVMStats(prvKey, vmUser, publicIp);
-		System.out.println("Memory Free: "+vmMap.get("free")+" Kb");
-		System.out.println("Cpu Free: "+vmMap.get("id")+" %");
-		 
-		 /*boolean
-		 isDockerInstalled=config.checkForDocker(keyPath, vmUser, publicIp); boolean
-		  isDockerStarted=config.checkForDockerService(keyPath, vmUser, publicIp);
-		  if(!isDockerInstalled) { config.installDocker(keyPath, vmUser, publicIp,
-		  linuxDist); } if(!isDockerStarted) { config.startDockerService(keyPath,
-		  vmUser, linuxDist); }
-		
-		config.startContainers(keyPath, vmUser, publicIp, repoPath);
-		containerIDs=config.getContainerIds(keyPath, vmUser, publicIp);
-		containerIDs.forEach(s -> System.out.println("Container : "+s+" is running"));*/
 	}
 }

@@ -13,11 +13,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Container {
-    private String id;
-    private VMModel server;
-    private ApplicationModel application;
-    private Integer memory;
-    private Integer cpu;
-   
+public class VMModel {
+	 private Long id;
+	    private String name;
+	    private String host;
+	    private String username;
+	    private byte[] privateKey;
+	    private Integer memory;
+		
 }

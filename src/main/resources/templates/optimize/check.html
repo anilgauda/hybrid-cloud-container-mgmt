@@ -28,6 +28,8 @@
         <div class="row col-lg-12">
             <form action="#" method="post" th:action="@{/deploy/optimize}">
                 <span th:each="vmId:${vmIds}"><input type="hidden" name="vmIds" th:value="${vmId}"/></span>
+                <input type="hidden" name="deploymentStrategy" th:value="${deploymentStrategy}"/>
+                <input type="hidden" name="weight" th:value="${weight}"/>
                 <button class="btn btn-primary" href="/deploy/optimize">Optimize</button>
                 <a class="btn btn-light" href="/deploy/optimize">Cancel</a>
             </form>

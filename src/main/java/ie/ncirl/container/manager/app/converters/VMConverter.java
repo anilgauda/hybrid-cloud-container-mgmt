@@ -21,4 +21,5 @@ public class VMConverter implements Converter<VMDTO, VM> {
                 .host(vmDTO.getHost()).privateKey(KeyUtils.inBytes(vmDTO.getPrivateKey()))
                 .memory(vmDTO.getMemory()).build();
     }
+    
 }

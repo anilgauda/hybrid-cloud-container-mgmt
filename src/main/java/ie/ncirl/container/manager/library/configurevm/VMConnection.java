@@ -12,14 +12,48 @@ import com.jcraft.jsch.Session;
 
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 
+/**
+ * The Class VMConnection.
+ */
 public class VMConnection {
+	
+	/** The connection. */
+	private static VMConnection connection = new VMConnection();
 
+	/**
+	 * Instantiates a new VM connection.
+	 */
+	private VMConnection() {
+
+	}
+
+	/**
+	 * Gets the connection.
+	 *
+	 * @return the connection
+	 */
+	public static VMConnection getConnection() {
+		return connection;
+
+	}
+
+	/**
+	 * Execute command.
+	 *
+	 * @param privateKey the private key
+	 * @param userName the user name
+	 * @param ipAddress the ip address
+	 * @param command the command
+	 * @return the array list
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws JSchException the j sch exception
+	 */
 	@SuppressWarnings({ "unused", "static-access" })
-	protected ArrayList<String> executeCommand(byte[] privateKey, String userName, String ipAddress, String command) throws IOException, JSchException {
+	ArrayList<String> executeCommand(byte[] privateKey, String userName, String ipAddress, String command) throws IOException, JSchException {
 		String line = null;
 		ArrayList<String> result = new ArrayList<>();
 		JSch javaShell = new JSch();
-		//javaShell.addIdentity(privateKeyPath);
+		// javaShell.addIdentity(privateKeyPath);
 
 		javaShell.addIdentity("", privateKey, null, null);
 		javaShell.setConfig(VMConstants.HOST_KEY_CHECK_CONFIG, VMConstants.HOST_KEY_CHECK_CONFIG_VALUE);

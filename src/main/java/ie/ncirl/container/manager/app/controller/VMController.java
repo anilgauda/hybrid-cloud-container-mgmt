@@ -3,6 +3,7 @@ package ie.ncirl.container.manager.app.controller;
 import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.app.service.ProviderService;
 import ie.ncirl.container.manager.app.service.VMService;
+import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.common.domain.validator.VMValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,14 @@ public class VMController {
     @Autowired
     private
     ProviderService providerService;
+    
+    @Autowired
+    private UserUtil userUtil;
 
     @GetMapping(value = "/vms/view")
     public String showListPage(Model model) {
-        model.addAttribute("vms", vmService.getAllVMs());
+    	
+        model.addAttribute("vms", vmService.findAllVmByUserId(userUtil.getCurrentUser().getId()));
         return "vm/view.html";
     }
 

@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ie.ncirl.container.manager.library.configurevm.model.Application;
+import ie.ncirl.container.manager.library.configurevm.model.ApplicationModel;
 import ie.ncirl.container.manager.library.configurevm.model.Container;
 import ie.ncirl.container.manager.library.configurevm.model.DeploymentModel;
-import ie.ncirl.container.manager.library.configurevm.model.VM;
+import ie.ncirl.container.manager.library.configurevm.model.VMModel;
 
 public class ApplicationWeightedStrategyTest {
 	@Test
@@ -18,16 +18,16 @@ public class ApplicationWeightedStrategyTest {
 		for(int i=0;i<5;i++) {
 			DeploymentModel dp=new DeploymentModel();
 				Container container=new Container();
-				Application app=new Application();
+				ApplicationModel app=new ApplicationModel();
 				app.setName("app1");
 				app.setRegistryImageUrl("repo1");
 				container.setApplication(app);
 				
-				VM vm=new VM();
+				VMModel vm=new VMModel();
 				vm.setName("vm1");
 				container.setServer(vm);
 				
-				VM optimalVM=new VM();
+				VMModel optimalVM=new VMModel();
 				vm.setName("vm2");
 				
 				dp.setContainer(container);
