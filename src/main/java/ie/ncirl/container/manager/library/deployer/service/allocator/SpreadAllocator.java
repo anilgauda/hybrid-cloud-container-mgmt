@@ -20,11 +20,15 @@ public class SpreadAllocator implements AppAllocatorStrategy {
             List<Application> applications = server.getContainerDeployments().stream()
                     .map(ContainerDeployment::getApplication).distinct()
                     .collect(Collectors.toList());
+
             Optional<Application> deployment = applications.stream().filter(
                     app -> app.equals(application)
             ).findAny();
 
+            // Gets the allocatable container based on memory (although code is part of this strategy this is moved
+            //  into the interface as this method is common across strategies. Other strategies will be built on this)
             int allocatableContainersInVM = getAllocatableContainersInVM(application, server);
+
             if (!deployment.isPresent() && allocatableContainersInVM > 0) {
                 pendingAllocations -= 1;
                 allocations.add(Allocation.builder().server(server).application(application).count(1).build());

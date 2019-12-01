@@ -6,8 +6,6 @@ import lombok.ToString;
 @ToString
 public enum DeploymentType {
 
-
-
     FILL(100), SPREAD(200);
 
     @Getter

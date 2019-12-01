@@ -35,10 +35,15 @@ public interface AppAllocatorStrategy {
     default int getAllocatableContainersInVM(Application application, VM vm) {
         int allocatableContainersInVM;
         List<ContainerDeployment> deployments = vm.getContainerDeployments();
+
         // Same containers will query db every time to get application. TODO: Improvement possible
-        Integer usedMemory = deployments.stream().mapToInt(deployment -> deployment.getApplication().getMemory()).sum();
+        Integer usedMemory = deployments.stream().mapToInt(
+                deployment -> deployment.getApplication().getMemory()
+        ).sum();
+
         // How many containers/deployments of this applications can be allocated in this VM ?
         Integer availableMemory = vm.getMemory() - usedMemory;
+
         allocatableContainersInVM = (int) (availableMemory / application.getMemory());
         return allocatableContainersInVM;
     }

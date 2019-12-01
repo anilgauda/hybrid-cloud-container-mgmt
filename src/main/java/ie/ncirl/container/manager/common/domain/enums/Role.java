@@ -4,7 +4,6 @@ import lombok.Getter;
 
 public enum Role {
 
-
     USER(100), GUEST(200), AGENT(300);
 
     @Getter

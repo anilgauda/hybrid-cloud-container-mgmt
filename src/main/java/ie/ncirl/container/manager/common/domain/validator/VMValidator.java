@@ -9,6 +9,7 @@ import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.VMConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -19,6 +20,10 @@ public class VMValidator implements Validator {
     @Autowired
     private
     VMService vmService;
+
+    @Autowired
+    private
+    VMConfig vmConfig;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -38,9 +43,8 @@ public class VMValidator implements Validator {
     }
 
     private void validateVMAccessDetails(VMDTO vmdto, Errors errors) {
-        VMConfig config = new VMConfig();
         try {
-            config.getLinuxDistribution(KeyUtils.inBytes(vmdto.getPrivateKey()), vmdto.getUsername(), vmdto.getHost());
+            vmConfig.getLinuxDistribution(KeyUtils.inBytes(vmdto.getPrivateKey()), vmdto.getUsername(), vmdto.getHost());
         } catch (DockerException e) {
             errors.rejectValue("privateKey", "invalid", " username/private key access details are invalid");
         }

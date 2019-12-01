@@ -1,4 +1,4 @@
-package ie.ncirl.container.manager.common.util;
+package ie.ncirl.container.manager.app.util;
 
 /**
  * Uses AES encryption to encrypt/decrypt strings

@@ -12,27 +12,27 @@ import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/*
-  Strategy working:
-  Consider virtual servers with pair of cpu, mem
-  V1 -> 4,5 4,5 4,7 \4,7 -> 18,24
-  V2 -> 6,4 6,4 5,4 5,4 -> 22,18
-  V3 -> \6,2 4,4 6,2 4,4 -> 20,12
-  V4 -> \2,6 3,4 \2,6 3,4 \10,1 -> 20,19
-  10,1 6,2
-  2,6 2,6 4,7 4,7
-  Here, some servers are fully utilized and some are partially utilized.
-  After running the algorithm,
-  V1 -> 10,1 2,6 2,6 6,2 4,7 -> 24,22   25,25
-  V2 ->
-  Above, all servers will be optimized with both cpu and memory
- */
-
 
 /**
- * Example
- * AWS -> 400,30 400,70   800,100
- * Azure -> 600,30 500,40   1100,70
+ * How it works?
+ * Consider following four servers with Memory,CPU pairs of docker containers running in each VM
+ * Example:
+ * AWS 1  -> 400,30 400,70  -- Total: 800, 100
+ * AWS 2  -> 300,30 400,60  -- Total: 700, 90
+ * Azure  -> 600,30 500,40  -- Total: 1100,70
+ * IBM    -> 900,10 300,30  -- Total: 1200,40
+ *
+ * For sake of simplicity of this example, assume above servers have max memory of 1200 and max cpu of 100.
+ *
+ * The algorithm makes use of the idea that memory and cpu are separate components so
+ * an application with high cpu can go with an application with high memory thus optimizing
+ * the VM. Hence, if we fill a VM with container having the highest CPU until the CPU used is
+ * greater than memory then fill with highest memory until the memory used is greater than CPU
+ * and go on repeating this process until the VM is completely filled, we will have an optimized VM.
+ * We can then run this for all VMs in the list. There are certain edge cases that have been handled
+ * in the code and commented below.
+ *
+ *
  * <p>
  * 600,30 500,40 400,30 400,70 -> memSorted
  * 400,70 500,40 400,30 600,30 -> cpuSorted
