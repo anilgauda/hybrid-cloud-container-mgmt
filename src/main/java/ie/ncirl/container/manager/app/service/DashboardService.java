@@ -10,12 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ie.ncirl.container.manager.app.converters.VMConverter;
+import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.DashboardVo;
 import ie.ncirl.container.manager.app.vo.VirtualMachineVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
+import ie.ncirl.container.manager.common.domain.enums.Role;
 import ie.ncirl.container.manager.library.configurevm.VMConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +42,9 @@ public class DashboardService {
 	/** The container service. */
 	@Autowired
 	ContainerDeploymentService containerService;
+	
+	@Autowired
+	VMConverter vmConvertor;
 
 	/** The user utility */
 	@Autowired
@@ -60,11 +66,17 @@ public class DashboardService {
 		VMConfig config = new VMConfig();
 		int numberOfContainers = 0;
 		int numberOfApplicationRunning = 0;
-		List<Application> applicationsVos = appService.getAllApplicationByUserId(userUtil.getCurrentUser().getId());
-		List<VM> vmList = vmService.findAllVmByUserId(userUtil.getCurrentUser().getId());
-		dashboardVo.setTotalVmNo(vmService.findByUserId(userUtil.getCurrentUser().getId()).size());
+		List<RegisterApplicationDto> applicationsVos=appService.getApplicationsByUser();
+		List<VM> vmList;
+		if (userUtil.getCurrentUserRole().contains(Role.USER.name())) {
+			vmList = vmConvertor.fromDTOList(vmService.getAllVMs());
+			dashboardVo.setTotalVmNo(vmService.getAllVMs().size());
+		}else {
+			vmList = vmService.findAllVmByUserId(userUtil.getCurrentUser().getId());
+			dashboardVo.setTotalVmNo(vmService.findByUserId(userUtil.getCurrentUser().getId()).size());
+		}
 		dashboardVo.setProviderNo(providerService.getAllProviders().size());
-		for (Application application : applicationsVos) {
+		for (RegisterApplicationDto application : applicationsVos) {
 			List<ContainerDeployment> containers = containerService.getContainersByAppId(application.getId());
 			numberOfContainers += containers.size();
 		}

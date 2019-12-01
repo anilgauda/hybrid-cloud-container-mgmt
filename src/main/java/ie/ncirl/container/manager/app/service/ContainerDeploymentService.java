@@ -17,7 +17,6 @@ import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
 import ie.ncirl.container.manager.app.converters.VMConverter;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.repository.ContainerDeploymentRepo;
-import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.DeploymentVo;
 import ie.ncirl.container.manager.app.vo.OptimizationVo;
 import ie.ncirl.container.manager.common.domain.Application;
@@ -56,9 +55,6 @@ public class ContainerDeploymentService {
     @Autowired
     private
     VMService vmService;
-
-    @Autowired
-    UserUtil userUtil;
 
     @Autowired
     private

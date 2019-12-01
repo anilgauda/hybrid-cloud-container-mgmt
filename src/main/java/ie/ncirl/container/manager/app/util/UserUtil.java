@@ -20,6 +20,14 @@ public class UserUtil {
 	public User getCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth.getName();
+		System.out.println("Current role :"+auth.getAuthorities().toString());
 		return userRepo.findByUsername(username);
+	}
+	
+	public String getCurrentUserRole() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String username = auth.getName();
+		System.out.println("Current role :"+auth.getAuthorities());
+		return auth.getAuthorities().toString();
 	}
 }
