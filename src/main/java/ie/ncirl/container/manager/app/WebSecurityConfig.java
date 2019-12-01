@@ -48,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web
                 .ignoring()
-                .antMatchers("/resources/**", "/assets/**", "/webjars/**", "/css/**", "/js/**", "/user/register");
+                .antMatchers("/resources/**", "/assets/**", "/webjars/**", "/css/**", "/js/**", "/user/register","/user/login");
     }
 
     @Bean
