@@ -104,7 +104,7 @@ public class VMController {
 	 */
 	private String renderCreatePage(Model model) {
 		model.addAttribute("availableProviders", providerService.getAllProviders());
-		return "/vm/create";
+		return "vm/create";
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class VMController {
 	private String renderEditPage(Model model, VMDTO vmdto) {
 		model.addAttribute("vmDto", vmdto);
 		model.addAttribute("availableProviders", providerService.getAllProviders());
-		return "/vm/edit";
+		return "vm/edit";
 	}
 
 }

@@ -36,7 +36,7 @@ public class ApplicationController {
 	@GetMapping(value = "/regapp")
 	public String getApplicationRegistered(Model model) {
 		model.addAttribute("regApplication", new RegisterApplicationDto());
-		return "/application/regapp";
+		return "application/regapp";
 	}
 
 	@PostMapping(value = "/regapp")
@@ -45,7 +45,7 @@ public class ApplicationController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("regApplication", regApplication);
 			model.addAttribute("message",  String.format("Application with name %s already Exist",regApplication.getName()));
-			return "/application/regapp";
+			return "application/regapp";
 		}
 		applicationService.saveApplication(regApplication);
 		redirectAttributes.addFlashAttribute("message", String.format("Application %s saved successfully", regApplication.getName()));
@@ -56,14 +56,14 @@ public class ApplicationController {
 	public String getRunningApplications(Model model) throws IOException, ContainerException {
 		List<ApplicationVo> applications = applicationService.getRunningApplication();
 		model.addAttribute("applications", applications);
-		return "/application/runapp";
+		return "application/runapp";
 	}
 
 	@RequestMapping(value = "/applicationList")
 	public String getApplicationList(Model model) {
 
 		model.addAttribute("regApplication", applicationService.getApplicationsByUser());
-		return "/application/applicationList";
+		return "application/applicationList";
 
 	}
 	
@@ -71,7 +71,7 @@ public class ApplicationController {
 	    public String editProvider(Model model,@PathVariable("id")String id) {
 		  System.out.println("Edit provider");
 		  model.addAttribute("regApplication", applicationService.getApplicationById(Long.parseLong(id)));
-			return "/application/editapp";
+			return "application/editapp";
 	    }
 
 	    @PostMapping(value = "/application/{id}/delete")

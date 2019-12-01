@@ -29,13 +29,13 @@ public class UserController {
     public String registration(Model model) {
         model.addAttribute("user", new User());
 
-        return "/user/register";
+        return "user/register";
     }
 
     @PostMapping("/user/register")
     public String registration(@ModelAttribute("user") User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "/user/register";
+            return "user/register";
         }
 
         String password = user.getPassword();
@@ -53,7 +53,7 @@ public class UserController {
             model.addAttribute("message", "You have been logged out successfully.");
 
         model.addAttribute("user", new User());
-        return "/user/login";
+        return "user/login";
     }
 
 }

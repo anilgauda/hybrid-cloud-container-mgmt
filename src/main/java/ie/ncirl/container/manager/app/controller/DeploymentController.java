@@ -91,7 +91,7 @@ public class DeploymentController {
     public String showOptimizeView(Model model) {
         model.addAttribute("vms", vmService.findAllVmByUserId(userUtil.getCurrentUser().getId()));
         model.addAttribute("strategy",Arrays.asList(AppDeployStrategy.values()));
-        return "/optimize/view";
+        return "optimize/view";
     }
 
     @PostMapping("/deploy/optimize/check")
@@ -101,7 +101,7 @@ public class DeploymentController {
         model.addAttribute("deploymentStrategy",strategy);
         model.addAttribute("weight",weight);
 
-        return "/optimize/check";
+        return "optimize/check";
     }
 
     @PostMapping("/deploy/optimize")

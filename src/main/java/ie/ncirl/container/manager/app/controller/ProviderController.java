@@ -51,7 +51,7 @@ public class ProviderController {
         log.info(String.format("Creating provider %s", provider));
         providerValidator.validate(provider, result);
         if (result.hasErrors()) {
-            return "/provider/create";
+            return "provider/create";
         }
 
         providerService.save(provider);
@@ -64,7 +64,7 @@ public class ProviderController {
         log.info(String.format("Editing provider %s", provider));
         providerValidator.validate(provider, result);
         if (result.hasErrors()) {
-            return "/provider/edit";
+            return "provider/edit";
         }
 
         providerService.save(provider);
