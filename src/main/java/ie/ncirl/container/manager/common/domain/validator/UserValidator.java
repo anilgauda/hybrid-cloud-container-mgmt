@@ -29,8 +29,15 @@ public class UserValidator implements Validator {
         }
 
         User existingUser = userService.findByUsername(user.getUsername());
-        if (existingUser != null) {
+
+        // when role code is empty it means user registration, validate username doesn't exist
+        if (existingUser != null && user.getRoleCode() == null) {
             errors.rejectValue("username", "not.unique", "User with same username already exists");
+        }
+
+        // when modifying role make sure user exists
+        if (existingUser == null && user.getRoleCode() != null) {
+            errors.rejectValue("username", "not.exists", "User with given username does not exist");
         }
     }
 }

@@ -14,6 +14,7 @@ public class RoleEnumConverter implements AttributeConverter<Role, Integer> {
 
     @Override
     public Role convertToEntityAttribute(Integer code) {
+        if (code == null) return Role.GUEST; // legacy data defaults to GUEST
         return Role.fromCode(code);
     }
 }

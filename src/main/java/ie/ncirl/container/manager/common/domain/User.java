@@ -12,8 +12,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode
 @Table(name = "users")
 public class User {
+
+    /**
+     * A default admin user created on install
+     */
+    public static final String ROOT_USERNAME = "root";
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
