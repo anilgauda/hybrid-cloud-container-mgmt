@@ -1,8 +1,10 @@
 package ie.ncirl.container.manager.app.controller;
 
+import ie.ncirl.container.manager.app.dto.UserDTO;
 import ie.ncirl.container.manager.app.service.SecurityService;
 import ie.ncirl.container.manager.app.service.UserService;
 import ie.ncirl.container.manager.common.domain.User;
+import ie.ncirl.container.manager.common.domain.validator.UserValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,9 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-/**
- * Login code taken referred from: https://www.baeldung.com/spring-security-login
- */
 @Slf4j
 @Controller
 public class UserController {
@@ -25,22 +24,24 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserValidator userValidator;
+
     @GetMapping("/user/register")
     public String registration(Model model) {
-        model.addAttribute("user", new User());
-
+        model.addAttribute("user", new UserDTO());
         return "user/register";
     }
 
     @PostMapping("/user/register")
-    public String registration(@ModelAttribute("user") User user, BindingResult bindingResult) {
+    public String registration(@ModelAttribute("user") UserDTO user, BindingResult bindingResult) {
+        userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             return "user/register";
         }
 
-        String password = user.getPassword();
         userService.save(user);
-        securityService.autoLogin(user.getUsername(), password);
+        securityService.autoLogin(user.getUsername(), user.getPassword());
         return "redirect:/";
     }
 

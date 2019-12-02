@@ -29,9 +29,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.Errors;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(value = {"spring.profiles.active=test"})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class VMValidatorTest {
 
     @Autowired
