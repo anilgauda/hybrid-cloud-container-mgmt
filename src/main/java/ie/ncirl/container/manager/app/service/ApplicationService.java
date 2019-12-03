@@ -68,7 +68,7 @@ public class ApplicationService {
 	public List<ApplicationVo> getRunningApplication() {
 		ContainerConfig config = new ContainerConfig();
 		List<ApplicationVo> applications = new ArrayList<>();
-		Pageable firstFiveElements = PageRequest.of(0, 2);
+		Pageable firstFiveElements = PageRequest.of(0, 5);
 		/** Get all the running container from application repo **/
 		Page<Application> listofApplication;
 		if (userUtil.getCurrentUserRole().contains(Role.USER.name())) {
