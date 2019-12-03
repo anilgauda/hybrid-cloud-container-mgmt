@@ -25,7 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class DashboardService {
+public class
+DashboardService {
 
 	/** The application service. */
 	@Autowired

@@ -27,8 +27,8 @@ public class UserService {
         return userRepo.findByUsername(username);
     }
 
-    public void save(UserDTO user) {
-        userRepo.save(User.builder()
+    public User save(UserDTO user) {
+        return userRepo.save(User.builder()
                 .username(user.getUsername())
                 .password(bCryptPasswordEncoder.encode(user.getPassword()))
                 .role(Role.GUEST)

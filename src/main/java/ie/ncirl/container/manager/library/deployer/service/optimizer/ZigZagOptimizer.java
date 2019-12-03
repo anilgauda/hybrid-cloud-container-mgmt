@@ -1,16 +1,13 @@
 package ie.ncirl.container.manager.library.deployer.service.optimizer;
 
-import ie.ncirl.container.manager.common.domain.Application;
-import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
-import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
-import ie.ncirl.container.manager.library.configurevm.constants.ContainerConstants;
-import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.deployer.dto.Container;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -21,9 +18,9 @@ import java.util.stream.Collectors;
  * AWS 2  -> 300,30 400,60  -- Total: 700, 90
  * Azure  -> 600,30 500,40  -- Total: 1100,70
  * IBM    -> 900,10 300,30  -- Total: 1200,40
- *
+ * <p>
  * For sake of simplicity of this example, assume above servers have max memory of 1200 and max cpu of 100.
- *
+ * <p>
  * The algorithm makes use of the idea that memory and cpu are separate components so
  * an application with high cpu can go with an application with high memory thus optimizing
  * the VM. Hence, if we fill a VM with container having the highest CPU until the CPU used is
@@ -45,16 +42,9 @@ import java.util.stream.Collectors;
  */
 
 
-public class ZigZagOptimizer implements Optimizer {
+public class ZigZagOptimizer extends OptimizerTemplate {
 
-    @Override
-    public List<OptimalContainer> getOptimalContainerData(List<VM> vms) throws ContainerException {
-        List<OptimalContainer> optimalContainers = new ArrayList<>();
-
-        setApplicationResourceConsumption(vms);
-        List<Container> containers = getAllContainersInVMs(vms);
-
-        if (containers.size() == 0) return optimalContainers;
+    public void findOptimalContainers(List<VM> vms, List<Container> containers, List<OptimalContainer> optimalContainers) {
 
         List<Container> cpuSortedContainers = getContainersSortedByCPU(containers);
         List<Container> memSortedContainers = getContainersSortedByMemory(containers);
@@ -65,32 +55,22 @@ public class ZigZagOptimizer implements Optimizer {
             int availableCpu = 100;
             int availableMemory = vm.getMemory();
 
-            // Sometimes a container may be not available but we still have to check the other list
-            // in such a case, we force to pick the other list. If both lists are forced that means
-            // no fitting containers are available, in this case, we move to the next VM
-            boolean forcePickCpuList = false;
-            boolean forcePickMemList = false;
-
             while (usedMemory < availableMemory && usedCpu < availableCpu &&
                     cpuSortedContainers.size() + memSortedContainers.size() > 0) {
-                if (forcePickCpuList && forcePickMemList) break;
 
                 List<Container> containerListToPick = cpuSortedContainers;
-                int percentUsedMemory = (usedMemory / availableMemory) * 100;
-                if ((forcePickMemList || usedCpu > percentUsedMemory) && !forcePickCpuList) {
+                int percentUsedMemory = (usedMemory / availableMemory) * 100; // to make memory comparable we get %
+                if (usedCpu > percentUsedMemory) {
                     containerListToPick = memSortedContainers;
                 }
 
+                int memoryLeft = availableMemory - usedMemory;
+                int cpuLeft = availableCpu - usedCpu;
                 Optional<Container> maybeContainer = getFirstFittingContainer(
-                        containerListToPick, availableMemory, availableCpu);
+                        containerListToPick, memoryLeft, cpuLeft);
 
                 if (!maybeContainer.isPresent()) {
-                    // == is intentional, we are comparing references not value
-                    if (containerListToPick == cpuSortedContainers) {
-                        forcePickMemList = true;
-                    } else {
-                        forcePickCpuList = true;
-                    }
+                    // No more space left in VM
                     continue;
                 }
                 Container container = maybeContainer.get();
@@ -106,14 +86,11 @@ public class ZigZagOptimizer implements Optimizer {
                 usedMemory += container.getMemory();
             }
         }
-
-        return optimalContainers;
     }
 
 
     /**
      * Filters the list of containers and gets the first container that is able to fit with given cpu/memory constraints
-     *
      * @param containers Containers to search in
      * @param memory     memory constraint
      * @param cpu        cpu constraint
@@ -121,7 +98,7 @@ public class ZigZagOptimizer implements Optimizer {
      */
     private Optional<Container> getFirstFittingContainer(List<Container> containers, Integer memory, Integer cpu) {
         return containers.stream().filter(
-                container -> container.getCpu() < cpu && container.getMemory() < memory
+                container -> container.getCpu() <= cpu && container.getMemory() <= memory
         ).findFirst();
     }
 
@@ -153,75 +130,6 @@ public class ZigZagOptimizer implements Optimizer {
                         .thenComparing(Container::getCpu)
         );
         return cpuSortedContainers;
-    }
-
-    /**
-     * Creates a Container object with Application, memory and cpu in every VM
-     *
-     * @param vms all VMs to scan
-     * @return container list
-     */
-    private List<Container> getAllContainersInVMs(List<VM> vms) {
-        return vms.stream().flatMap(
-                vm -> vm.getContainerDeployments().stream().map(
-                        containerDeployment -> Container.builder()
-                                .id(containerDeployment.getContainerId())
-                                .application(containerDeployment.getApplication())
-                                .server(vm)
-                                .cpu(containerDeployment.getApplication().getCpu())
-                                .memory(containerDeployment.getApplication().getMemory())
-                                .build())
-        ).collect(Collectors.toList());
-    }
-
-
-    /**
-     * Gets container stats for those application that do not have cpu/mem set
-     *
-     * @param vms VMs
-     */
-    public void setApplicationResourceConsumption(List<VM> vms) throws ContainerException {
-        ContainerConfig config = new ContainerConfig();
-
-        for (VM vm : vms) {
-            for (ContainerDeployment container : vm.getContainerDeployments()) {
-                Application application = container.getApplication();
-
-                if (application.getMemory() != 0 && application.getCpu() != 0) continue;
-
-                Map<String, String> stats = config.getContainerStats(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), container.getContainerId());
-
-                if (application.getMemory() == 0) {
-                    application.setMemory(getMemoryFromStats(
-                            stats.get(ContainerConstants.CONTAINER_STATS_KEY_MEMORY_USAGE)));
-                }
-
-                if (application.getCpu() == 0) {
-                    application.setCpu(getCpuFromStats(
-                            stats.get(ContainerConstants.CONTAINER_STATS_KEY_CPU_USAGE)));
-                }
-            }
-        }
-    }
-
-    /**
-     * Get memory stat from docker stats
-     *
-     * @param memStat memory in MB
-     * @return memory int
-     */
-    private Integer getMemoryFromStats(String memStat) {
-        return (int) Math.ceil(Double.parseDouble(memStat.replace("MiB", "")));
-    }
-
-    /**
-     * Get CPU stat
-     *
-     * @param cpuStat cpu usage in %
-     * @return cpu int
-     */
-    private Integer getCpuFromStats(String cpuStat) {
-        return (int) Math.ceil(Double.parseDouble(cpuStat.replace("%", "")));
     }
 
 }

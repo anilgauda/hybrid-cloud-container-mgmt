@@ -1,7 +1,6 @@
 package ie.ncirl.container.manager.app.controller;
 
 import ie.ncirl.container.manager.app.dto.UserDTO;
-import ie.ncirl.container.manager.app.service.SecurityService;
 import ie.ncirl.container.manager.app.service.UserService;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.common.domain.User;
@@ -23,9 +22,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Controller
 public class UserController {
-
-    @Autowired
-    private SecurityService securityService;
 
     @Autowired
     private UserService userService;
@@ -60,7 +56,6 @@ public class UserController {
         }
 
         userService.save(user);
-        securityService.autoLogin(user.getUsername(), user.getPassword());
         return "redirect:/";
     }
 

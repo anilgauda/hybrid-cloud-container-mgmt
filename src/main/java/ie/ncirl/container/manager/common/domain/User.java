@@ -37,5 +37,5 @@ public class User {
 
     @Builder.Default
     @Column
-    Role role = Role.USER;
+    Role role = Role.GUEST;
 }

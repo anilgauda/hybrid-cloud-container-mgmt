@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import ie.ncirl.container.manager.library.deployer.service.optimizer.OptimizerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -193,7 +194,7 @@ public class ContainerDeploymentService {
         Optimizer optimizer = new ZigZagOptimizer();
         List<OptimalContainer> optimalContainers = new ArrayList<>();
         try {
-            optimalContainers = optimizer.getOptimalContainerData(vms);
+            optimalContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.AS_IS);
         } catch (ContainerException e) {
             log.error("Failed to optimize vm containers", e);
         }
@@ -210,7 +211,7 @@ public class ContainerDeploymentService {
     public List<OptimizationVo> getOptimizationChanges(List<VM> vms) {
         List<OptimalContainer> optimalContainers = getOptimalContainers(vms);
         Map<String, OptimizationVo> optimizationMap = new HashMap<>();
-        ZigZagOptimizer optimizer = new ZigZagOptimizer();
+        Optimizer optimizer = new ZigZagOptimizer();
         try {
             optimizer.setApplicationResourceConsumption(vms);
         } catch (ContainerException e) {
@@ -244,8 +245,8 @@ public class ContainerDeploymentService {
      * Optimizes all VMs by moving them optimally across VMs
      *
      * @param vms VMs where optimization algorithm will run
-     * @param j 
-     * @param i 
+     * @param strategyCode Type of strategy
+     * @param weight Weight
      * @throws ContainerException 
      */
     public void optimizeContainers(List<VM> vms, int strategyCode, int weight) throws ContainerException {

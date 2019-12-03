@@ -4,7 +4,6 @@ import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
-import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import ie.ncirl.container.manager.library.deployer.dto.Container;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import org.junit.Test;
@@ -22,7 +21,7 @@ public class ZigZagOptimizerTest {
 
 
     @Test
-    public void testThatAllContainersAreAllocated() throws DockerException, ContainerException {
+    public void testThatAllContainersAreAllocated() throws ContainerException {
         List<VM> vms = new ArrayList<>();
         List<ContainerDeployment> awsContainers = new ArrayList<>();
         Application awsApp1 = Application.builder().memory(500).cpu(50).build();
@@ -35,7 +34,7 @@ public class ZigZagOptimizerTest {
         vms.add(aws);
 
         Optimizer optimizer = new ZigZagOptimizer();
-        List<OptimalContainer> actualAllocations = optimizer.getOptimalContainerData(vms);
+        List<OptimalContainer> actualAllocations = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.AS_IS);
 
         List<OptimalContainer> expectedAllocations = new ArrayList<>();
         expectedAllocations.add(
@@ -47,8 +46,18 @@ public class ZigZagOptimizerTest {
         assertThat(actualAllocations, is(expectedAllocations));
     }
 
+    /**
+     * INPUT
+     * 400,70 500,40 400,30 600,30
+     * 600,30 500,40 400,30 400,70
+     *
+     * OUTPUT
+     * 400,70 600,30 -> aws
+     * 500,40 400,30 -> azure
+     * @throws ContainerException
+     */
     @Test
-    public void testThatVMsAreOptimized() throws DockerException, ContainerException {
+    public void testThatVMsAreOptimized() throws ContainerException {
         List<VM> vms = new ArrayList<>();
         List<ContainerDeployment> awsContainers = new ArrayList<>();
 
@@ -75,7 +84,85 @@ public class ZigZagOptimizerTest {
         vms.add(azure);
 
         Optimizer optimizer = new ZigZagOptimizer();
-        List<OptimalContainer> actualContainers = optimizer.getOptimalContainerData(vms);
+        List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.AS_IS);
+
+        List<OptimalContainer> expectedContainers = new ArrayList<>();
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp2Container, aws), aws));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp3Container, azure), aws));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp4Container, azure), azure));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp1Container, aws), azure));
+
+        assertThat(actualContainers, is(expectedContainers));
+    }
+
+    @Test
+    public void testThatVMsAreOptimizedInAscOrder() throws ContainerException {
+        List<VM> vms = new ArrayList<>();
+        List<ContainerDeployment> awsContainers = new ArrayList<>();
+
+        Application awsApp1 = Application.builder().memory(600).cpu(30).build();
+        ContainerDeployment awsApp1Container = buildContainerDeploymentObject(awsApp1);
+        Application awsApp2 = Application.builder().memory(600).cpu(70).build();
+        ContainerDeployment awsApp2Container = buildContainerDeploymentObject(awsApp2);
+
+        awsContainers.add(awsApp1Container);
+        awsContainers.add(awsApp2Container);
+        VM aws = buildVMObject("aws", (int) (1.6 * GB), awsContainers);
+        vms.add(aws);
+
+        List<ContainerDeployment> azureContainers = new ArrayList<>();
+
+        Application awsApp3 = Application.builder().memory(800).cpu(30).build();
+        ContainerDeployment awsApp3Container = buildContainerDeploymentObject(awsApp3);
+        Application awsApp4 = Application.builder().memory(500).cpu(40).build();
+        ContainerDeployment awsApp4Container = buildContainerDeploymentObject(awsApp4);
+
+        azureContainers.add(awsApp3Container);
+        azureContainers.add(awsApp4Container);
+        VM azure = buildVMObject("azure", (int) (1.4 * GB), azureContainers);
+        vms.add(azure);
+
+        Optimizer optimizer = new ZigZagOptimizer();
+        List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.ASC_MEM);
+
+        List<OptimalContainer> expectedContainers = new ArrayList<>();
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp2Container, aws), azure));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp1Container, aws), azure));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp4Container, azure), aws));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp3Container, azure), aws));
+
+        assertThat(actualContainers, is(expectedContainers));
+    }
+
+    @Test
+    public void testThatVMsAreOptimizedInDescOrder() throws ContainerException {
+        List<VM> vms = new ArrayList<>();
+        List<ContainerDeployment> awsContainers = new ArrayList<>();
+
+        Application awsApp1 = Application.builder().memory(600).cpu(30).build();
+        ContainerDeployment awsApp1Container = buildContainerDeploymentObject(awsApp1);
+        Application awsApp2 = Application.builder().memory(600).cpu(70).build();
+        ContainerDeployment awsApp2Container = buildContainerDeploymentObject(awsApp2);
+
+        awsContainers.add(awsApp1Container);
+        awsContainers.add(awsApp2Container);
+        VM aws = buildVMObject("aws", (int) (1.6 * GB), awsContainers);
+        vms.add(aws);
+
+        List<ContainerDeployment> azureContainers = new ArrayList<>();
+
+        Application awsApp3 = Application.builder().memory(800).cpu(30).build();
+        ContainerDeployment awsApp3Container = buildContainerDeploymentObject(awsApp3);
+        Application awsApp4 = Application.builder().memory(500).cpu(40).build();
+        ContainerDeployment awsApp4Container = buildContainerDeploymentObject(awsApp4);
+
+        azureContainers.add(awsApp3Container);
+        azureContainers.add(awsApp4Container);
+        VM azure = buildVMObject("azure", (int) (1.4 * GB), azureContainers);
+        vms.add(azure);
+
+        Optimizer optimizer = new ZigZagOptimizer();
+        List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.DESC_MEM);
 
         List<OptimalContainer> expectedContainers = new ArrayList<>();
         expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp2Container, aws), aws));
@@ -135,7 +222,7 @@ public class ZigZagOptimizerTest {
      *
      * @param container Container
      * @param vm        Virtual Machine
-     * @return OptimalContainer objectawsApp2Container
+     * @return OptimalContainer
      */
     private OptimalContainer buildOptimalContainerObject(Container container, VM vm) {
         return OptimalContainer.builder()

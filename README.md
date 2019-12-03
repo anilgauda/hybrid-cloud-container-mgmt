@@ -52,4 +52,8 @@ TODO
  #  incorrect allocations due to wrong memory fetches from VMs
  
  
- https://www.baeldung.com/spring-security-login
+ # How to run JUnit tests
+ 
+  - Create a postgres database
+  - Update the database access details in application-test.properties
+  - Now run using the gradle task to execute all tests in your test db
