@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(value = { "spring.profiles.active=test" })
 @AutoConfigureMockMvc
 public class ApplicationControllerTest {
 
