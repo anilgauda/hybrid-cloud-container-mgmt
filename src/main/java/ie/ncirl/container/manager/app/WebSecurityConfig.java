@@ -31,7 +31,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
+                .authorizeRequests().antMatchers("/resources/**", "/assets/**", "/webjars/**", "/css/**", "/js/**", "/user/register")
+                .permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
@@ -47,12 +48,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     //this method allows static resources to be neglected by spring security
-    @Override
+   /* @Override
     public void configure(WebSecurity web) {
         web
                 .ignoring()
                 .antMatchers("/resources/**", "/assets/**", "/webjars/**", "/css/**", "/js/**", "/user/register");
-    }
+    }*/
 
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {
