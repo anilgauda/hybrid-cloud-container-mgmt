@@ -1,15 +1,16 @@
 package ie.ncirl.container.manager.app.service;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import ie.ncirl.container.manager.app.dto.UserDTO;
 import ie.ncirl.container.manager.app.repository.UserRepo;
 import ie.ncirl.container.manager.common.domain.User;
 import ie.ncirl.container.manager.common.domain.enums.Role;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -21,7 +22,7 @@ public class UserService {
 
     @Autowired
     private
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    PasswordEncoder  bCryptPasswordEncoder;
 
     public User findByUsername(String username) {
         return userRepo.findByUsername(username);
