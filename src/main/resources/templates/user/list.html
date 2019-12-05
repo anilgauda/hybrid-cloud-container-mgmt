@@ -1,9 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::section})}" >
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::section})}">
 
 <section class="container-fluid">
 
     <div th:if="${message}" th:text="${message}" class="alert alert-success"/>
+
+    <style type="text/css">
+        .table {
+            table-layout: fixed;
+        }
+
+        .table td {
+            word-wrap: break-word;
+        }
+    </style>
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -29,13 +39,15 @@
 
                     <td th:text="${user.username}">Name</td>
                     <td th:switch="${user.role.name()}">
-                        <form th:case="GUEST" style="display: inline" action="#" th:action="@{|/user/${user.id}/role/USER|}"
+                        <form th:case="GUEST" style="display: inline" action="#"
+                              th:action="@{|/user/${user.id}/role/USER|}"
                               method="POST">
                             <button class='btn btn-success' type="submit">
                                 <i class="fa fa-arrow-up"></i> Promote to ADMIN
                             </button>
                         </form>
-                        <form th:case="USER" style="display: inline" action="#" th:action="@{|/user/${user.id}/role/GUEST|}"
+                        <form th:case="USER" style="display: inline" action="#"
+                              th:action="@{|/user/${user.id}/role/GUEST|}"
                               method="POST">
                             <button class='btn btn-info' type="submit">
                                 <i class="fa fa-arrow-down"></i> Demote to USER
@@ -43,8 +55,32 @@
                         </form>
                     </td>
                 </tr>
-
             </table>
+
+            <nav th:if="${pageNumbers}" aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item" th:each="pageNumber : ${pageNumbers}"
+                        th:classappend="${pageNumber==currPage + 1} ? active">
+                        <a th:href="@{/user/list(size=10, page=${pageNumber})}" th:text=${pageNumber}
+                           class="page-link">
+                        </a>
+                    </li>
+                    <li class="page-item disabled" th:if="${totalPages}">
+                        <a class="page-link" style="line-height: 12px;padding-bottom: 16px;">.</a>
+                    </li>
+                    <li class="page-item disabled" th:if="${totalPages}">
+                        <a class="page-link" style="line-height: 12px;padding-bottom: 16px;">.</a>
+                    </li>
+                    <li class="page-item disabled" th:if="${totalPages}">
+                        <a class="page-link" style="line-height: 12px;padding-bottom: 16px;">.</a>
+                    </li>
+                    <li class="page-item" th:if="${totalPages}">
+                        <a th:href="@{/user/list(size=10, page=${totalPages})}" th:text=${totalPages}
+                           class="page-link">
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 

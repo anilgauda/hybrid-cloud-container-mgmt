@@ -1,23 +1,25 @@
 package ie.ncirl.container.manager.app.controller;
 
+import ie.ncirl.container.manager.app.dto.PageData;
 import ie.ncirl.container.manager.app.dto.UserDTO;
 import ie.ncirl.container.manager.app.service.UserService;
+import ie.ncirl.container.manager.app.util.PageUtil;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.common.domain.User;
 import ie.ncirl.container.manager.common.domain.validator.UserValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Controller
@@ -39,12 +41,20 @@ public class UserController {
     }
 
     @GetMapping("/user/list")
-    public String showUserList(Model model) {
-        List<User> users = userService.findAll().stream()
+    public String showUserList(Model model, @RequestParam("page") Optional<Integer> page,
+                               @RequestParam("size") Optional<Integer> size) {
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(10);
+        Page<User> usersPage = userService.findAll(PageRequest.of(currentPage - 1, pageSize));
+        List<User> users = usersPage.stream()
                 .filter(user -> !user.getUsername().equals(User.ROOT_USERNAME))
-                .sorted(Comparator.comparing(User::getUsername))
                 .collect(Collectors.toList());
+
         model.addAttribute("users", users);
+        PageData pageData = PageUtil.getPageData(usersPage);
+        model.addAttribute("pageNumbers", pageData.getPageNumbers());
+        model.addAttribute("currPage", pageData.getCurrPage());
+        model.addAttribute("totalPages", pageData.getTotalPages());
         return "user/list";
     }
 

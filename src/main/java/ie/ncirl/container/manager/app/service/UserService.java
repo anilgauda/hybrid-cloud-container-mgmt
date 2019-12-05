@@ -1,8 +1,8 @@
 package ie.ncirl.container.manager.app.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +46,7 @@ public class UserService {
         return userRepo.getOne(id);
     }
 
-    public List<User> findAll() {
-        return userRepo.findAll();
+    public Page<User> findAll(Pageable pageable) {
+        return userRepo.findAll(pageable);
     }
 }
