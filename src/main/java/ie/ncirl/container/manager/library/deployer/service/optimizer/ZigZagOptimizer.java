@@ -1,5 +1,6 @@
 package ie.ncirl.container.manager.library.deployer.service.optimizer;
 
+import ie.ncirl.container.manager.app.util.CryptUtil;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.deployer.dto.Container;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
@@ -132,4 +133,7 @@ public class ZigZagOptimizer extends OptimizerTemplate {
         return cpuSortedContainers;
     }
 
+    public ZigZagOptimizer(CryptUtil cryptUtil) {
+        super(cryptUtil);
+    }
 }

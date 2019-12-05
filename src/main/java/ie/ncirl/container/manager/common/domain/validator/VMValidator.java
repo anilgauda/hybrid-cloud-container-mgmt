@@ -1,15 +1,11 @@
 package ie.ncirl.container.manager.common.domain.validator;
 
 import ie.ncirl.container.manager.app.dto.VMDTO;
-import ie.ncirl.container.manager.app.service.ProviderService;
 import ie.ncirl.container.manager.app.service.VMService;
 import ie.ncirl.container.manager.app.util.KeyUtils;
-import ie.ncirl.container.manager.common.domain.Provider;
-import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.VMConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -1,5 +1,6 @@
 package ie.ncirl.container.manager.library.deployer.service.optimizer;
 
+import ie.ncirl.container.manager.app.util.CryptUtil;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
@@ -7,6 +8,8 @@ import ie.ncirl.container.manager.library.configurevm.exception.ContainerExcepti
 import ie.ncirl.container.manager.library.deployer.dto.Container;
 import ie.ncirl.container.manager.library.deployer.dto.OptimalContainer;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +18,13 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+@SpringBootTest
 public class ZigZagOptimizerTest {
 
     private int GB = 1000; // In MB
 
+    @Autowired
+    CryptUtil cryptUtil;
 
     @Test
     public void testThatAllContainersAreAllocated() throws ContainerException {
@@ -33,7 +39,7 @@ public class ZigZagOptimizerTest {
         awsContainers.add(awsApp1Container1);
         vms.add(aws);
 
-        Optimizer optimizer = new ZigZagOptimizer();
+        Optimizer optimizer = new ZigZagOptimizer(cryptUtil);
         List<OptimalContainer> actualAllocations = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.AS_IS);
 
         List<OptimalContainer> expectedAllocations = new ArrayList<>();
@@ -83,7 +89,7 @@ public class ZigZagOptimizerTest {
         VM azure = buildVMObject("azure", (int) (1.2 * GB), azureContainers);
         vms.add(azure);
 
-        Optimizer optimizer = new ZigZagOptimizer();
+        Optimizer optimizer = new ZigZagOptimizer(cryptUtil);
         List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.AS_IS);
 
         List<OptimalContainer> expectedContainers = new ArrayList<>();
@@ -122,7 +128,7 @@ public class ZigZagOptimizerTest {
         VM azure = buildVMObject("azure", (int) (1.4 * GB), azureContainers);
         vms.add(azure);
 
-        Optimizer optimizer = new ZigZagOptimizer();
+        Optimizer optimizer = new ZigZagOptimizer(cryptUtil);
         List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.ASC_MEM);
 
         List<OptimalContainer> expectedContainers = new ArrayList<>();
@@ -161,7 +167,7 @@ public class ZigZagOptimizerTest {
         VM azure = buildVMObject("azure", (int) (1.4 * GB), azureContainers);
         vms.add(azure);
 
-        Optimizer optimizer = new ZigZagOptimizer();
+        Optimizer optimizer = new ZigZagOptimizer(cryptUtil);
         List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.DESC_MEM);
 
         List<OptimalContainer> expectedContainers = new ArrayList<>();

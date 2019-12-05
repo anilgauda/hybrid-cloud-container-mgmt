@@ -3,6 +3,8 @@ package ie.ncirl.container.manager.app.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import ie.ncirl.container.manager.app.util.CryptUtil;
+import ie.ncirl.container.manager.app.util.KeyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,9 @@ public class ApplicationService {
 	@Autowired
 	private RegisterApplicationConvertor convertor;
 
+	@Autowired
+	private CryptUtil cryptUtil;
+
 	/**
 	 * Gets the all the running applications from application tables and fetch there
 	 * stats from running virtual machine.
@@ -93,7 +98,9 @@ public class ApplicationService {
 					containerVo.setVmName(vm.getName());
 					containerVo.setProviderName(provider.getName());
 					try {
-						containerVo.setStats(config.getContainerStats(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), container.getContainerId()));
+						containerVo.setStats(config.getContainerStats(KeyUtils.inBytes(
+								cryptUtil.decryptBytes(vm.getPrivateKey())), vm.getUsername(),
+								vm.getHost(), container.getContainerId()));
 					} catch (ContainerException e) {
 						logger.error("Error Occured While fetching container stats");
 					}

@@ -1,10 +1,13 @@
 package ie.ncirl.container.manager.app.service;
 
+import ie.ncirl.container.manager.app.util.CryptUtil;
+import ie.ncirl.container.manager.app.util.KeyUtils;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.VMConfig;
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,9 @@ import java.util.Map;
 @Component
 @Profile("!test")
 public class VMClientImpl implements VMClient {
+
+    @Autowired
+    CryptUtil cryptUtil;
 
     /**
      * Gets the current available memory in a VM
@@ -25,7 +31,8 @@ public class VMClientImpl implements VMClient {
 
         VMConfig config = new VMConfig();
         try {
-            Map<String, Integer> stats = config.getVMStats(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
+            Map<String, Integer> stats = config.getVMStats(KeyUtils.inBytes(cryptUtil.decryptBytes(vm.getPrivateKey()))
+                    , vm.getUsername(), vm.getHost());
             Integer memInKb = stats.get(VMConstants.VM_STAT_FREE_MEMORY);
             return memInKb / 1000;
         } catch (DockerException e) {
@@ -42,18 +49,19 @@ public class VMClientImpl implements VMClient {
      */
     public void configureVM(VM vm) {
         VMConfig config = new VMConfig();
+        byte[] privateKey = KeyUtils.inBytes(cryptUtil.decryptBytes(vm.getPrivateKey()));
         try {
             log.info("VmPostListener Triggered");
-            boolean isDockerInstalled = config.checkForDocker(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
+            boolean isDockerInstalled = config.checkForDocker(privateKey, vm.getUsername(), vm.getHost());
             if (isDockerInstalled) {
-                boolean isDockerRunning = config.checkForDockerService(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
+                boolean isDockerRunning = config.checkForDockerService(privateKey, vm.getUsername(), vm.getHost());
                 if (!isDockerRunning) {
-                    config.startDockerService(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
+                    config.startDockerService(privateKey, vm.getUsername(), vm.getHost());
                 }
             } else {
-                String dist = config.getLinuxDistribution(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
-                config.installDocker(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), dist);
-                config.startDockerService(vm.getPrivateKey(), vm.getUsername(), vm.getHost());
+                String dist = config.getLinuxDistribution(privateKey, vm.getUsername(), vm.getHost());
+                config.installDocker(privateKey, vm.getUsername(), vm.getHost(), dist);
+                config.startDockerService(privateKey, vm.getUsername(), vm.getHost());
             }
 
         } catch (DockerException e) {

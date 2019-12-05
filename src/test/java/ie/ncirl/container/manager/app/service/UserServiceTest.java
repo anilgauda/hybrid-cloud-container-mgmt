@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -94,8 +95,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findAll(Pageable pageable) {
-        Page<User> users = userService.findAll(pageable);
+    public void findAll() {
+        Page<User> users = userService.findAll(PageRequest.of(0,10));
 
         assertThat(users.getTotalElements(), greaterThan(0L));
     }

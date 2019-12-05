@@ -1,5 +1,7 @@
 package ie.ncirl.container.manager.library.deployer.service.optimizer;
 
+import ie.ncirl.container.manager.app.util.CryptUtil;
+import ie.ncirl.container.manager.app.util.KeyUtils;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.VM;
@@ -24,9 +26,16 @@ import java.util.stream.Collectors;
 public abstract class OptimizerTemplate implements Optimizer {
 
     /**
+     * Encryption was added later so the vm private keys passed here are all encrypted.
+     * Instead of changing every single variable to use a decrypted version of the private key,
+     * we instead use constructor injection to inject a dependency to decrypt it.
+     */
+    private CryptUtil cryptUtil;
+
+    /**
      * The actual algorithm outline. It calls the implementation of the optimization in findOptimalContainers
      *
-     * @param vms VMs to optimize
+     * @param vms     VMs to optimize
      * @param vmOrder The order in which the VMs will be optimized
      * @return Optimal Containers
      * @throws ContainerException exception when jsch fails
@@ -79,7 +88,9 @@ public abstract class OptimizerTemplate implements Optimizer {
 
                 if (application.getMemory() != 0 && application.getCpu() != 0) continue;
 
-                Map<String, String> stats = config.getContainerStats(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), container.getContainerId());
+                Map<String, String> stats = config.getContainerStats(
+                        KeyUtils.inBytes(cryptUtil.decryptBytes(vm.getPrivateKey())), vm.getUsername(),
+                        vm.getHost(), container.getContainerId());
 
                 if (application.getMemory() == 0) {
                     application.setMemory(getMemoryFromStats(
@@ -133,5 +144,9 @@ public abstract class OptimizerTemplate implements Optimizer {
         ).collect(Collectors.toList());
     }
 
+
+    OptimizerTemplate(CryptUtil cryptUtil) {
+        this.cryptUtil = cryptUtil;
+    }
 
 }

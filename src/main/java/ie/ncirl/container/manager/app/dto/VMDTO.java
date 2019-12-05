@@ -24,6 +24,9 @@ public class VMDTO implements DTO {
     @NotNull
     private String username;
 
+    /**
+     * Decrypted private key. Must not be printed in logs
+     */
     @NotNull
     @ToString.Exclude
     private String privateKey;
