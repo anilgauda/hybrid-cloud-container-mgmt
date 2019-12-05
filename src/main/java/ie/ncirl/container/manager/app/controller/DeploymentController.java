@@ -39,7 +39,7 @@ public class DeploymentController {
     private UserUtil userUtil;
 
 
-    @RequestMapping(value = "/deployapp")
+    @GetMapping(value = "/deployapp")
     public String getDeployedApp(Model model) {
         addModelAttributesForDeployApp(model);
         model.addAttribute("deploymentVo", new DeploymentVo());

@@ -32,6 +32,7 @@ public class ApplicationController {
 
 	@Autowired
 	private RegisterApplicationValidator validator;
+	
 
 	@GetMapping(value = "/regapp")
 	public String getApplicationRegistered(Model model) {
@@ -52,14 +53,14 @@ public class ApplicationController {
 		return "redirect:/applicationList";
 	}
 
-	@RequestMapping(value = "/runapp")
+	@GetMapping(value = "/runapp")
 	public String getRunningApplications(Model model) throws IOException, ContainerException {
 		List<ApplicationVo> applications = applicationService.getRunningApplication();
 		model.addAttribute("applications", applications);
 		return "application/runapp";
 	}
 
-	@RequestMapping(value = "/applicationList")
+	@GetMapping(value = "/applicationList")
 	public String getApplicationList(Model model) {
 
 		model.addAttribute("regApplication", applicationService.getApplicationsByUser());
@@ -68,16 +69,16 @@ public class ApplicationController {
 	}
 	
 	  @GetMapping(value = "/application/{id}/edit")
-	    public String editProvider(Model model,@PathVariable("id")String id) {
-		  System.out.println("Edit provider");
+	    public String editApplication(Model model,@PathVariable("id")String id) {
+		 log.debug("Edit Application");
 		  model.addAttribute("regApplication", applicationService.getApplicationById(Long.parseLong(id)));
 			return "application/editapp";
 	    }
 
 	    @PostMapping(value = "/application/{id}/delete")
-	    public String deleteProvider(@PathVariable("id") String id,RedirectAttributes redirectAttributes) {
-	    	System.out.println("Delete Provider");
-	    	RegisterApplicationDto regApp=applicationService.getApplicationById(Long.parseLong(id));
+	    public String deleteApplication(@PathVariable("id") String id,RedirectAttributes redirectAttributes) {
+	    	 log.debug("Delete Application");
+	    	 RegisterApplicationDto regApp=applicationService.getApplicationById(Long.parseLong(id));
 	    		try {
 					applicationService.deleteApplicationById(Long.parseLong(id));
 				} catch (Exception e) {
@@ -97,7 +98,7 @@ public class ApplicationController {
 	    
 	    @GetMapping(value = "/application/{appId}/stop")
 	    public String deleteContainer(@PathVariable("appId") String appId,RedirectAttributes redirectAttributes) {
-	    	System.out.println("Stop Application"+ Long.parseLong(appId));
+	    	 log.debug("Stop Application"+ Long.parseLong(appId));
 	    	applicationService.stopApplication(Long.parseLong(appId));
 			return "redirect:/runapp";
 	      

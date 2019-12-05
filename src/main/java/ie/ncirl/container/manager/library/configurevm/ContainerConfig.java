@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,6 +25,7 @@ public class ContainerConfig {
 	
 	/** The connection. */
 	VMConnection connection=VMConnection.getConnection();
+	Logger logger= Logger.getLogger(ContainerConfig.class.getName());
 	
 	/**
 	 * *************
@@ -63,13 +66,11 @@ public class ContainerConfig {
 				containerValFilt.add(val);
 			}
 		}
-		//System.out.println("Length of the keys array" + containerParamFilt.size()); // Logger INFO
-		//System.out.println("Length of the val array" + containerValFilt.size()); // Logger INFO
 		for (int i = 0; i < containerParamFilt.size(); i++) {
 			containerStatsMap.put(containerParamFilt.get(i), containerValFilt.get(i));
 		}
 
-		containerStatsMap.forEach((k, v) -> System.out.println("Key :" + k + "  Value :" + v)); // Logger INFO
+		containerStatsMap.forEach((k, v) -> logger.log(Level.INFO,"Key :" + k + "  Value :" + v)); // Logger INFO
 		}
 		return containerStatsMap;
 	}
@@ -90,7 +91,7 @@ public class ContainerConfig {
 		for (String container : containerIds) {
 			containerId += " " + container;
 		}
-		System.out.println(String.format(VMConstants.DOCKER_CONTAINER_STOP, containerId)); // Logger INFO
+		logger.log(Level.INFO,String.format(VMConstants.DOCKER_CONTAINER_STOP, containerId)); // Logger INFO
 		try {
 			listOfContainersStopped = connection.executeCommand(privateKey, userName, ipAddress, String.format(VMConstants.DOCKER_CONTAINER_STOP, containerId));
 		} catch (JSchException | IOException e) {
@@ -122,7 +123,7 @@ public class ContainerConfig {
 				containerIds.set(i, containerid.substring(0, 12));
 			}
 		}
-		containerIds.forEach(s -> System.out.println(s));
+		containerIds.forEach(s ->logger.log(Level.INFO,s));
 		return containerIds;
 	}
 

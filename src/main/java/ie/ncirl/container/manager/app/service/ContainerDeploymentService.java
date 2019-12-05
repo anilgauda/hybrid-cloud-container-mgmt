@@ -150,7 +150,7 @@ public class ContainerDeploymentService {
             try {
                 config.stopContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), containerList);
             } catch (ContainerException e) {
-                System.out.println("Failed to Stop containers");
+            	 log.debug("Failed to Stop containers");
             }
         }
         containerRepo.deleteByApplicationId(appId);
@@ -264,8 +264,8 @@ public class ContainerDeploymentService {
         ContainersList containerLists= strategy.execute(optimalConvertor.fromDTOList(optimalContainers), weight);
         List<Container> deployedContainers=containerLists.getDeployedContainers();
         List<Container> unDeployedContainers=containerLists.getUndeployedContainers();
-        System.out.println("Containers to be Deployed"+deployedContainers.toString());
-        System.out.println("Containers to be Undeployed"+unDeployedContainers.toString());
+        log.debug("Containers to be Deployed"+deployedContainers.toString());
+        log.debug("Containers to be Undeployed"+unDeployedContainers.toString());
         for(Container container: deployedContainers) {
             deployContainer(container.getId(),modelAppConvertor.from(container.getApplication()),modelVMConvertor.from( container.getServer()));
 

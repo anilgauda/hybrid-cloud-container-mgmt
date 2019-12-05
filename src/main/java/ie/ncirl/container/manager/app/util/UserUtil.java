@@ -3,6 +3,8 @@ package ie.ncirl.container.manager.app.util;
 import ie.ncirl.container.manager.app.repository.UserRepo;
 import ie.ncirl.container.manager.common.domain.User;
 import ie.ncirl.container.manager.common.domain.enums.Role;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 /**
  * This class will be refactored after user authentication has been implemented
  */
+@Slf4j
 @Component
 public class UserUtil {
 
@@ -20,14 +23,14 @@ public class UserUtil {
     public User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        System.out.println("Current role :" + auth.getAuthorities().toString());
+        log.debug("Current role :" + auth.getAuthorities().toString());
         return userRepo.findByUsername(username);
     }
 
     public String getCurrentUserRole() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        System.out.println("Current role :" + auth.getAuthorities());
+        log.debug("Current role :" + auth.getAuthorities());
         return auth.getAuthorities().toString();
     }
 

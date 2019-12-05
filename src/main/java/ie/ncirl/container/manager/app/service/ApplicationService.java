@@ -116,7 +116,7 @@ public class ApplicationService {
 		Application application = convertor.from(regApplication);
 		User user = userUtil.getCurrentUser();
 		application.setUser(user);
-		System.out.println(application.toString());
+		 log.debug(application.toString());
 		applicationRepo.save(application);
 	}
 

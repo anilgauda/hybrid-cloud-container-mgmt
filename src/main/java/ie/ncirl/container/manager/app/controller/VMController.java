@@ -41,8 +41,8 @@ public class VMController {
 
 	@GetMapping(value = "/vms/view")
 	public String showListPage(Model model) {
-		System.out.println("Compare Current role: "+userUtil.getCurrentUserRole());
-		System.out.println("Enum Role: "+ Role.USER.toString());
+		 log.debug("Compare Current role: "+userUtil.getCurrentUserRole());
+		 log.debug("Enum Role: "+ Role.USER.toString());
 		if (userUtil.getCurrentUserRole().contains(Role.USER.toString())) {
 			model.addAttribute("vms", vmService.getAllVMs());
 		} else {

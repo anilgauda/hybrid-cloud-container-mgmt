@@ -83,9 +83,8 @@ public class VMWeightedStrategy implements WeightedStrategy {
 				appContainerMap.put(app.getRegistryImageUrl(), containerIds);
 			}
 		}
-		System.out.println("Undeploy map");
+		logger.log(Level.INFO,"Undeploy map");
 		appVMUndeployMap.forEach((key,value)-> {
-			System.out.println("Key :"+key+" value: "+value);
 		});
 		vmAppMap.forEach((key,value) -> {
 			
