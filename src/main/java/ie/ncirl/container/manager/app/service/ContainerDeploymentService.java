@@ -28,6 +28,9 @@ import ie.ncirl.container.manager.library.deployer.service.optimizer.Optimizer;
 import ie.ncirl.container.manager.library.deployer.service.optimizer.ZigZagOptimizer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -283,4 +286,8 @@ public class ContainerDeploymentService {
         saveContainers(containerDeployment);
 
     }
+
+	public Page<ContainerDeployment> getContainersByAppId(Long id, Pageable pageable ) {
+        return containerRepo.findAllByApplicationId(id,pageable);
+	}
 }

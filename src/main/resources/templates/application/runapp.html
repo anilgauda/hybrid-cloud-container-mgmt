@@ -8,19 +8,23 @@
 	</div>
 	<div class="row">
 		<!-- Collapsable Card Example -->
-		<div class="card shadow mb-4" th:each="runningApp :${applications}">
-			 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-				<h6 class="m-0 font-weight-bold text-primary" th:text="${runningApp.applicationName}"></h6>
-			    <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                      <div class="dropdown-header">Function:</div>
-                      <a class="dropdown-item" th:href="@{|/application/${runningApp.appId}/stop|}">Stop Application</a>
-                    </div>
-                  </div>
-			</div>
+		<div class="col-lg-6" th:each="runningApp :${applications}">
+			<div class="card shadow mb-4">
+				<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+					<h6 class="m-0 font-weight-bold text-primary" th:text="${runningApp.applicationName}"></h6>
+					<div class="dropdown no-arrow">
+						<a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false"> <i
+							class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+						</a>
+						<div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+							aria-labelledby="dropdownMenuLink">
+							<div class="dropdown-header">Function:</div>
+							<a class="dropdown-item" th:href="@{|/application/${runningApp.appId}/stop|}">Stop
+								Application</a>
+						</div>
+					</div>
+				</div>
 				<div class="card-body">
 					<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 						<thead>
@@ -35,16 +39,32 @@
 							<td th:text="${container.vmName}">123</td>
 							<td>
 								<ul>
-									<li th:each="stats: ${container.stats}">
-									<span th:text="${stats.key}"></span> = <span th:text="${stats.value}"></span>
-									</li>
+									<li th:each="stats: ${container.stats}"><span th:text="${stats.key}"></span> = <span
+										th:text="${stats.value}"></span></li>
 								</ul>
 							</td>
 						</tr>
 					</table>
+					<nav th:if="${pageNumbers}" aria-label="Page navigation example">
+						<ul class="pagination">
+							<li class="page-item" th:each="pageNumber : ${pageNumbers}"
+								th:classappend="${pageNumber==currPage + 1} ? active"><a
+								th:href="@{/runapp(size=2, page=${pageNumber})}" th:text=${pageNumber} class="page-link">
+							</a></li>
+							<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
+								style="line-height: 12px; padding-bottom: 16px;">.</a></li>
+							<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
+								style="line-height: 12px; padding-bottom: 16px;">.</a></li>
+							<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
+								style="line-height: 12px; padding-bottom: 16px;">.</a></li>
+							<li class="page-item" th:if="${totalPages}"><a
+								th:href="@{/runapp(size=2, page=${pageNumber})}" th:text=${totalPages} class="page-link">
+							</a></li>
+						</ul>
+					</nav>
 				</div>
+			</div>
 		</div>
-		<!-- Collapsable Card Example End-->
 	</div>
 </section>
 </html>

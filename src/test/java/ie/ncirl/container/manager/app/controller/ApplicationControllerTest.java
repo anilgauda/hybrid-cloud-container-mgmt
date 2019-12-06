@@ -62,7 +62,7 @@ public class ApplicationControllerTest {
     public void testSubmitApplication() throws Exception {
     	RegisterApplicationDto applicationDto=RegisterApplicationDto.builder().name("test").build();
     	this.mockMvc.perform(
-    			post("/regapp",applicationDto).with(user("admin")).with(csrf()))
+    			post("/regapp").with(user("admin")).with(csrf()).flashAttr("applicationDto",applicationDto))
     			.andDo(print())
     			.andExpect(status().is3xxRedirection());
     }
@@ -79,6 +79,17 @@ public class ApplicationControllerTest {
     
     @Test
     @WithMockUser(username = "admin", roles = "USER")
+    public void testEditApplication() throws Exception {
+    	long appId=appRepo.findAll().get(0).getId();
+        this.mockMvc.perform(post("/editSave").with(user("admin")).with(csrf()).flashAttr("RegisterApplicationDto", RegisterApplicationDto.builder().Id(appId).name("app2").build()))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection());
+     
+    }
+    
+    
+    @Test
+    @WithMockUser(username = "admin", roles = "USER")
     public void testGetApplicationList() throws Exception {
         this.mockMvc.perform(get("/applicationList").with(user("admin")).with(csrf()))
                 .andDo(print())
@@ -90,9 +101,29 @@ public class ApplicationControllerTest {
     @WithMockUser(username = "admin", roles = "USER")
     public void testEditProvider() throws Exception {
     	long appId=appRepo.findAll().get(0).getId();
-        this.mockMvc.perform(get("/application/"+appId+"/edit").with(user("admin")).with(csrf()))
+        this.mockMvc.perform(get(String.format("/application/%d/edit", appId)).with(user("admin")).with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk());
+     
+    }
+    
+    @Test
+    @WithMockUser(username = "admin", roles = "USER")
+    public void testStopApplication() throws Exception {
+    	long appId=appRepo.findAll().get(0).getId();
+        this.mockMvc.perform(get(String.format("/application/%d/stop", appId)).with(user("admin")).with(csrf()))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection());
+     
+    }
+    
+    @Test
+    @WithMockUser(username = "admin", roles = "USER")
+    public void testDeleteApplication() throws Exception {
+    	long appId=appRepo.findAll().get(0).getId();
+        this.mockMvc.perform(post(String.format("/application/%d/delete", appId)).with(user("admin")).with(csrf()))
+                .andDo(print())
+                .andExpect(status().is3xxRedirection());
      
     }
     @After

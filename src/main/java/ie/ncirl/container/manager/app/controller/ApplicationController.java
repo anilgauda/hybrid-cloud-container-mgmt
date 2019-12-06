@@ -1,7 +1,7 @@
 package ie.ncirl.container.manager.app.controller;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.service.ApplicationService;
-import ie.ncirl.container.manager.app.vo.ApplicationVo;
+import ie.ncirl.container.manager.app.vo.PageApplicationVo;
 import ie.ncirl.container.manager.common.domain.validator.RegisterApplicationValidator;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +54,15 @@ public class ApplicationController {
 	}
 
 	@GetMapping(value = "/runapp")
-	public String getRunningApplications(Model model) throws IOException, ContainerException {
-		List<ApplicationVo> applications = applicationService.getRunningApplication();
-		model.addAttribute("applications", applications);
+	public String getRunningApplications(Model model, @RequestParam("page") Optional<Integer> page,
+            @RequestParam("size") Optional<Integer> size) throws IOException, ContainerException {
+		int currentPage = page.orElse(1);
+        int pageSize = size.orElse(2);
+		PageApplicationVo applications = applicationService.getRunningApplication(currentPage,pageSize);
+		model.addAttribute("applications", applications.getApplicationVo());
+        model.addAttribute("pageNumbers", applications.getPageNumbers());
+        model.addAttribute("currPage", applications.getCurrPage());
+        model.addAttribute("totalPages", applications.getTotalPages());
 		return "application/runapp";
 	}
 

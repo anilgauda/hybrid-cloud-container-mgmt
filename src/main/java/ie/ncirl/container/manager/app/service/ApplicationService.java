@@ -3,23 +3,25 @@ package ie.ncirl.container.manager.app.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import ie.ncirl.container.manager.app.util.CryptUtil;
-import ie.ncirl.container.manager.app.util.KeyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
+import ie.ncirl.container.manager.app.dto.PageData;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.exception.ApplicationException;
 import ie.ncirl.container.manager.app.repository.ApplicationRepo;
+import ie.ncirl.container.manager.app.util.CryptUtil;
+import ie.ncirl.container.manager.app.util.KeyUtils;
+import ie.ncirl.container.manager.app.util.PageUtil;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.ApplicationVo;
 import ie.ncirl.container.manager.app.vo.ContainerVo;
+import ie.ncirl.container.manager.app.vo.PageApplicationVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.Provider;
@@ -70,21 +72,22 @@ public class ApplicationService {
 	 *
 	 * @return the running application
 	 */
-	public List<ApplicationVo> getRunningApplication() {
+	public PageApplicationVo getRunningApplication(int currentPage,int pageSize) {
+		PageApplicationVo pageAppVo=new PageApplicationVo();
 		ContainerConfig config = new ContainerConfig();
 		List<ApplicationVo> applications = new ArrayList<>();
-		Pageable firstFiveElements = PageRequest.of(0, 5);
-		/** Get all the running container from application repo **/
-		Page<Application> listofApplication;
+		Page<ContainerDeployment> containers = null;
+				/** Get all the running container from application repo **/
+		List<Application> listofApplication;
 		if (userUtil.getCurrentUserRole().contains(Role.USER.name())) {
-			listofApplication = applicationRepo.findAll(firstFiveElements);
+			listofApplication = applicationRepo.findAll();
 		} else {
-			listofApplication = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId(), firstFiveElements);
+			listofApplication = applicationRepo.findAllByUserId(userUtil.getCurrentUser().getId());
 
 		}
 		for (Application application : listofApplication) {
-			List<ContainerDeployment> containers = containerService.getContainersByAppId(application.getId());
-			if (containers.size() > 0) {
+			containers = containerService.getContainersByAppId(application.getId(),PageRequest.of(currentPage - 1, pageSize));
+			if (containers.hasContent()) {
 				/** Create applicationvo to display it on page **/
 				ApplicationVo applicationVo = new ApplicationVo();
 				List<ContainerVo> containersVo = new ArrayList<>();
@@ -110,8 +113,13 @@ public class ApplicationService {
 				applications.add(applicationVo);
 			}
 
-		}
-		return applications;
+		} 
+		PageData pageData = PageUtil.getPageData(containers);
+		pageAppVo.setApplicationVo(applications);
+		pageAppVo.setCurrPage(pageData.getCurrPage());
+		pageAppVo.setPageNumbers(pageData.getPageNumbers());
+		pageAppVo.setTotalPages(pageData.getTotalPages());
+		return pageAppVo;
 	}
 
 	/**
@@ -179,10 +187,10 @@ public class ApplicationService {
 	 */
 	public void deleteApplicationById(Long id) throws ApplicationException {
 		List<ContainerDeployment> runningContainers = containerService.getContainersByAppId(id);
-		if (runningContainers.size() > 0) {
+		if (runningContainers.size() == 0) {
 			applicationRepo.deleteById(id);
 		} else {
-			throw new ApplicationException("Unable to Delete Application Please delete the stop the containers");
+			throw new ApplicationException("Unable to Delete Application as it is already running");
 		}
 	}
 

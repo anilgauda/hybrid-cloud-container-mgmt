@@ -1,6 +1,5 @@
 package ie.ncirl.container.manager.app.service;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,7 +28,7 @@ import ie.ncirl.container.manager.app.repository.ProviderRepo;
 import ie.ncirl.container.manager.app.repository.UserRepo;
 import ie.ncirl.container.manager.app.repository.VMRepo;
 import ie.ncirl.container.manager.app.util.KeyUtils;
-import ie.ncirl.container.manager.app.vo.ApplicationVo;
+import ie.ncirl.container.manager.app.vo.PageApplicationVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
 import ie.ncirl.container.manager.common.domain.Provider;
@@ -114,7 +113,7 @@ public class ApplicationServiceTest {
 	@Test
 	@WithMockUser(username = "user", authorities = { "USER" })
 	public void testGetRunningApp() {
-		List<ApplicationVo> applications = applicationService.getRunningApplication();
+		PageApplicationVo  applications = applicationService.getRunningApplication(1, 2);
 		Assert.assertNotNull("List of applications fetched failed ", applications);
 	}
 	

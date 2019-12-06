@@ -90,13 +90,14 @@ DashboardService {
         }
         dashboardVo.setProviderNo(providerService.getAllProviders().size());
         for (RegisterApplicationDto application : applicationsVos) {
-            List<ContainerDeployment> containers = containerService.getContainersByAppId(application.getId());
+        	List<ContainerDeployment> containers = containerService.getContainersByAppId(application.getId());
             numberOfContainers += containers.size();
         }
         List<VirtualMachineVo> vmVoList = new ArrayList<>();
         for (VM vm : vmList) {
             VirtualMachineVo vmVo = new VirtualMachineVo();
-            vmVo.setNumOfContainers(vm.getContainerDeployments().size());
+            List<ContainerDeployment>containers=vm.getContainerDeployments();
+            vmVo.setNumOfContainers(containers.size());
             Map<String, Integer> vmStats = new HashMap<>();
             try {
                 vmStats = config.getVMStats(KeyUtils.inBytes(cryptUtil.decryptBytes(vm.getPrivateKey())),
