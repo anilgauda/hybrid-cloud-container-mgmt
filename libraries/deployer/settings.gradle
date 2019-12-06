@@ -1,0 +1,3 @@
+rootProject.name = 'deployer'
+include ':configurevm'
+project(':configurevm').projectDir = new File("../configurevm")

@@ -1,6 +1,18 @@
 hybrid-cloud-container-mgmt
 ==
 
+# Project Structure
+
+## Root project
+The main project is present in `container-management` directory. The main project depends on two libraries
+which are present in a different directories with their own build.gradle
+
+## Libraries
+The libraries are present separately in two different gradle projects under the `libraries` directory
+These libraries can be built independently of the main project thus making it possible to be used in 
+any other project by publishing them to the maven repository.
+
+
 # Encryption (DRAFT??)
 
 All private key files are stored in home directory defined in application.proprties
