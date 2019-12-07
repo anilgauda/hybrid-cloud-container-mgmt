@@ -50,7 +50,7 @@ public class ZigZagOptimizerTest {
      * 400,70 600,30 -> aws
      * 500,40 400,30 -> azure
      *
-     * @throws ContainerException
+     * @throws ContainerException exception
      */
     @Test
     public void testThatVMsAreOptimized() throws ContainerException {
@@ -165,6 +165,66 @@ public class ZigZagOptimizerTest {
         expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp3Container, azure), aws));
         expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp4Container, azure), azure));
         expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp1Container, aws), azure));
+
+        assertThat(actualContainers, is(expectedContainers));
+    }
+
+    @Test
+    public void testThatVMsAreOptimizedInAsIsOrderWithForcePickedLists() throws ContainerException {
+        List<VMData> vms = new ArrayList<>();
+
+        List<ContainerDeploymentData> aws1Containers = new ArrayList<>();
+        ApplicationData awsApp1 = ApplicationData.builder().memory(400).cpu(30).build();
+        ContainerDeploymentData awsApp1Container = buildContainerDeploymentObject(awsApp1);
+        ApplicationData awsApp2 = ApplicationData.builder().memory(400).cpu(70).build();
+        ContainerDeploymentData awsApp2Container = buildContainerDeploymentObject(awsApp2);
+        aws1Containers.add(awsApp1Container);
+        aws1Containers.add(awsApp2Container);
+        VMData aws1 = buildVMObject("aws1", (int) (1.2 * GB), aws1Containers);
+        vms.add(aws1);
+
+        List<ContainerDeploymentData> aws2Containers = new ArrayList<>();
+        ApplicationData awsApp3 = ApplicationData.builder().memory(300).cpu(30).build();
+        ContainerDeploymentData awsApp3Container = buildContainerDeploymentObject(awsApp3);
+        ApplicationData awsApp4 = ApplicationData.builder().memory(400).cpu(60).build();
+        ContainerDeploymentData awsApp4Container = buildContainerDeploymentObject(awsApp4);
+        aws2Containers.add(awsApp3Container);
+        aws2Containers.add(awsApp4Container);
+        VMData aws2 = buildVMObject("aws2", (int) (1.2 * GB), aws2Containers);
+        vms.add(aws2);
+
+        List<ContainerDeploymentData> azureContainers = new ArrayList<>();
+        ApplicationData azureApp1 = ApplicationData.builder().memory(600).cpu(30).build();
+        ContainerDeploymentData azureApp1Container = buildContainerDeploymentObject(azureApp1);
+        ApplicationData azureApp2 = ApplicationData.builder().memory(500).cpu(40).build();
+        ContainerDeploymentData azureApp2Container = buildContainerDeploymentObject(azureApp2);
+        azureContainers.add(azureApp1Container);
+        azureContainers.add(azureApp2Container);
+        VMData azure = buildVMObject("azure", (int) (1.2 * GB), azureContainers);
+        vms.add(azure);
+
+        List<ContainerDeploymentData> ibmContainers = new ArrayList<>();
+        ApplicationData ibmApp1 = ApplicationData.builder().memory(600).cpu(30).build();
+        ContainerDeploymentData ibmApp1Container = buildContainerDeploymentObject(ibmApp1);
+        ApplicationData ibmApp2 = ApplicationData.builder().memory(500).cpu(40).build();
+        ContainerDeploymentData ibmApp2Container = buildContainerDeploymentObject(ibmApp2);
+        ibmContainers.add(ibmApp1Container);
+        ibmContainers.add(ibmApp2Container);
+        VMData ibm = buildVMObject("ibm", (int) (1.2 * GB), ibmContainers);
+        vms.add(ibm);
+
+        Optimizer optimizer = new ZigZagOptimizer();
+        List<OptimalContainer> actualContainers = optimizer.getOptimizedContainers(vms, Optimizer.VMOrder.AS_IS);
+
+        List<OptimalContainer> expectedContainers = new ArrayList<>();
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp2Container, aws1), aws1));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(azureApp1Container, azure), aws1));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp4Container, aws2), aws2));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(ibmApp1Container, ibm), aws2));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(azureApp2Container, azure), azure));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(ibmApp2Container, ibm), azure));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp3Container, aws2), ibm));
+        expectedContainers.add(buildOptimalContainerObject(buildContainerObject(awsApp1Container, aws1), ibm));
 
         assertThat(actualContainers, is(expectedContainers));
     }

@@ -18,9 +18,9 @@ import java.util.Optional;
  * AWS 2  -> 300,30 400,60  -- Total: 700, 90
  * Azure  -> 600,30 500,40  -- Total: 1100,70
  * IBM    -> 900,10 300,30  -- Total: 1200,40
- * <p>
+ *
  * For sake of simplicity of this example, assume above servers have max memory of 1200 and max cpu of 100.
- * <p>
+ *
  * The algorithm makes use of the idea that memory and cpu are separate components so
  * an applicationData with high cpu can go with an applicationData with high memory thus optimizing
  * the VMData. Hence, if we fill a VMData with container having the highest CPU until the CPU used is
@@ -30,15 +30,17 @@ import java.util.Optional;
  * in the code and commented below.
  *
  *
- * <p>
- * 600,30 500,40 400,30 400,70 -> memSorted
- * 400,70 500,40 400,30 600,30 -> cpuSorted
- * <p>
- * AWS   -> 600,40 400,70 -> 1000,110
- * Azure -> 500,40 400,30 -> 900,80
- * <p>
- * AWS   -> 400,70 600,30  -> 1000 100
- * Azure ->
+ * 600,30 600,30 500,40 500,40 400,30 400,60 400,70 300,30 -> memSorted
+ * 400,70 400,60 500,40 500,40 300,30 400,30 600,30 600,30 -> cpuSorted
+ *
+ * AWS1  -> 400,70 600,30 -> 1000,100
+ * AWS2  -> 400,60 600,30 -> 1000,90
+ * Azure -> 500,40 500,40 -> 1000,80
+ * IBM   -> 300,30 400,30  -> 700 60
+ *
+ * As you can see, IBM now uses comparatively less  memory and cpu, we can possibly switch this
+ * instance to a lower priced instance. If they are more containers and vms in real case scenarios,
+ * it is very likely to end up with free/empty vms that we can directly shut down effectively saving money.
  */
 
 
@@ -55,12 +57,21 @@ public class ZigZagOptimizer extends OptimizerTemplate {
             int availableCpu = 100;
             int availableMemory = vmData.getMemory();
 
+            // Sometimes a container may be not available but we still have to check the other list
+            // in such a case, we force to pick the other list. If both lists are forced that means
+            // no fitting containers are available, in this case, we move to the next VM
+            // Note: This is also necessary to prevent an infinite loop in cases where it's not possible
+            // to optimize VMs 100%. In this case we break the loop after checking both lists
+            boolean forcePickCpuList = false;
+            boolean forcePickMemList = false;
+
             while (usedMemory < availableMemory && usedCpu < availableCpu &&
                     cpuSortedContainers.size() + memSortedContainers.size() > 0) {
+                if (forcePickCpuList && forcePickMemList) break;
 
                 List<Container> containerListToPick = cpuSortedContainers;
-                int percentUsedMemory = (usedMemory / availableMemory) * 100; // to make memory comparable we get %
-                if (usedCpu > percentUsedMemory) {
+                int percentUsedMemory = (int)((float) usedMemory / availableMemory) * 100; // to make memory comparable we get %
+                if ((forcePickMemList || usedCpu > percentUsedMemory) && !forcePickCpuList) {
                     containerListToPick = memSortedContainers;
                 }
 
@@ -70,6 +81,12 @@ public class ZigZagOptimizer extends OptimizerTemplate {
                         containerListToPick, memoryLeft, cpuLeft);
 
                 if (!maybeContainer.isPresent()) {
+                    // == is intentional, we are comparing references not value
+                    if (containerListToPick == cpuSortedContainers) {
+                        forcePickMemList = true;
+                    } else {
+                        forcePickCpuList = true;
+                    }
                     // No more space left in VMData
                     continue;
                 }

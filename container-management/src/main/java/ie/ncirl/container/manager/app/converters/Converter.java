@@ -27,10 +27,4 @@ public interface Converter<D extends DTO, M> {
                 .collect(Collectors.toList());
     }
 
-    default List<M> fromDTOList(final Collection<D> dtos) {
-        return dtos.stream()
-                .map(this::from)
-                .collect(Collectors.toList());
-    }
-
 }

@@ -14,9 +14,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -32,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(value = {"spring.profiles.active=test"})
 @AutoConfigureMockMvc
-@WithMockUser(username = "test", roles = "GUEST")
+@WithMockUser(username = "admin", roles = "USER")
 public class VMControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -49,11 +57,13 @@ public class VMControllerTest {
     @Autowired
     private VMService vmService;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Before
     public void setUp() throws Exception {
+        userRepo.save(User.builder().username("test").password("pass").role(Role.GUEST).build());
         userRepo.save(User.builder().username("admin").role(Role.USER).build());
-        userRepo.save(User.builder().username("test").role(Role.GUEST).build());
         providerRepo.save(Provider.builder().name("adminProvider").build());
         vmService.save(buildVMDTO("adminVM1"));
         vmService.save(buildVMDTO("adminVM2"));
@@ -71,16 +81,18 @@ public class VMControllerTest {
         this.mockMvc.perform(get("/vms/view"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Servers")));
+                .andExpect(content().string(containsString("Servers")))
+                .andExpect(model().attribute("vms", hasSize(2)));
     }
 
     @Test
     public void shouldReturnEmptyForTest() throws Exception {
-        this.mockMvc.perform(get("/vms/view"))
+        UserDetails testUser = userDetailsService.loadUserByUsername("test");
+        this.mockMvc.perform(get("/vms/view").with(user(testUser)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Servers")))
-                .andExpect(model().attribute("vms", hasSize(2)));
+                .andExpect(model().attribute("vms", hasSize(0)));
     }
 
     @Test
