@@ -13,6 +13,12 @@ configurations {
     }
 }
 
+jar {
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -21,7 +27,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.10")
     compileOnly 'org.projectlombok:lombok:1.18.10'
 
-    implementation project(':configurevm')
+    //implementation project(':configurevm')
+    implementation files('lib/configurevm-0.0.1-SNAPSHOT.jar')
 
     implementation 'org.slf4j:slf4j-api:1.7.29'
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
