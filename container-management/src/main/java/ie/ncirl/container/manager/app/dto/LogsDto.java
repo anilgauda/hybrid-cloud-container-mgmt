@@ -1,6 +1,6 @@
-package ie.ncirl.container.manager.app.vo;
+package ie.ncirl.container.manager.app.dto;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +15,8 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageApplicationVo {
-List<ApplicationVo> applicationVo;
-List<Integer> pageNumbers;
-Integer currPage;
-Integer totalPages;
+public class LogsDto implements DTO {
+
+	private static final long serialVersionUID = 1L;
+	private String details;
 }

@@ -23,6 +23,10 @@
                         <button data-toggle="modal" data-target="#logoutModal" class="dropdown-item">
                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
                         </button>
+                        
+                         <a sec:authorize="hasAuthority('USER')" href="#" role="button" th:href="@{/logs/view}" class="dropdown-item">
+                            <i class="fa fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Access Logs
+                        </a>
                 </div>
             </li>
         </ul>

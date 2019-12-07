@@ -1,18 +1,22 @@
 package ie.ncirl.container.manager.app.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import ie.ncirl.container.manager.app.converters.VMConverter;
 import ie.ncirl.container.manager.app.dto.VMDTO;
 import ie.ncirl.container.manager.app.repository.ProviderRepo;
 import ie.ncirl.container.manager.app.repository.VMRepo;
 import ie.ncirl.container.manager.app.util.UserUtil;
+import ie.ncirl.container.manager.common.domain.Logs;
 import ie.ncirl.container.manager.common.domain.VM;
+import ie.ncirl.container.manager.common.domain.logging.Log;
+import ie.ncirl.container.manager.common.domain.logging.VmLogs;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,7 +39,10 @@ public class VMService {
 
     @Autowired
     private VMClient vmClient;
-
+    
+    @Autowired
+    private LogsService logservice;
+    
     public List<VMDTO> getAllVMs() {
         return converter.fromDomainList(vmRepo.findAll());
     }
@@ -72,11 +79,17 @@ public class VMService {
         if (vmDTO.getId() == null) {
             vm.setMemory(vmClient.getAvailableMemory(vm));
         }
-
+        
         vmRepo.save(vm);
+        if(vmDTO.getId()!=null) {
+            createLog(vm, "Update");
+        }else {
+            createLog(vm, "Create");
+        }
     }
 
     public void delete(Long id) {
+    	createLog(findVMById(id), "Delete");
         vmRepo.deleteById(id);
     }
 
@@ -92,4 +105,9 @@ public class VMService {
     public List<VM> findAllVmByUserId(Long userId) {
         return vmRepo.findAllByUserId(userId);
     }
+    public void createLog(VM vm, String operation) {
+		Log appLog = new VmLogs();
+		Logs log = Logs.builder().details(appLog.createLogData(vm, operation, userUtil.getCurrentUser().getUsername(), userUtil.getCurrentUserRole())).build();
+		logservice.saveLogs(log);
+	}
 }

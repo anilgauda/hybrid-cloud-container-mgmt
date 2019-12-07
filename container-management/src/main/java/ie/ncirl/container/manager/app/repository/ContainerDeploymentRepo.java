@@ -23,6 +23,5 @@ public interface ContainerDeploymentRepo extends JpaRepository<ContainerDeployme
     @Transactional
     void deleteByContainerId(String containerId);
 
-	Page<ContainerDeployment> findAllByApplicationId(Long appId, Pageable pageable);
-
+	ContainerDeployment findByContainerId(String containerId);
 }

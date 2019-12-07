@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{fragments/layout :: layout(~{::section})}">
+<section class="container-fluid">
+	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+		<h1 class="h3 mb-0 text-gray-800">Logs</h1>
+	</div>
+	<div class="card shadow mb-4">
+		<div class="card-header py-3">
+			<h6 class="m-0 font-weight-bold text-primary">Access Logs</h6>
+		</div>
+		<div class="card-body">
+				<div th:each="log:${logs}">
+					<p th:text="${log.details}">
+				</div>
+				<nav th:if="${pageNumbers}" aria-label="Page navigation example">
+					<ul class="pagination">
+						<li class="page-item" th:each="pageNumber : ${pageNumbers}"
+							th:classappend="${pageNumber==currPage + 1} ? active"><a
+							th:href="@{/logs/view(size=10, page=${pageNumber})}" th:text=${pageNumber} class="page-link">
+						</a></li>
+						<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
+							style="line-height: 12px; padding-bottom: 16px;">.</a></li>
+						<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
+							style="line-height: 12px; padding-bottom: 16px;">.</a></li>
+						<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
+							style="line-height: 12px; padding-bottom: 16px;">.</a></li>
+						<li class="page-item" th:if="${totalPages}"><a
+							th:href="@{/logs/view(size=10, page=${totalPages})}" th:text=${totalPages} class="page-link">
+						</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+</section>
+</html>

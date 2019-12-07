@@ -45,23 +45,6 @@
 							</td>
 						</tr>
 					</table>
-					<nav th:if="${pageNumbers}" aria-label="Page navigation example">
-						<ul class="pagination">
-							<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-								th:classappend="${pageNumber==currPage + 1} ? active"><a
-								th:href="@{/runapp(size=2, page=${pageNumber})}" th:text=${pageNumber} class="page-link">
-							</a></li>
-							<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
-								style="line-height: 12px; padding-bottom: 16px;">.</a></li>
-							<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
-								style="line-height: 12px; padding-bottom: 16px;">.</a></li>
-							<li class="page-item disabled" th:if="${totalPages}"><a class="page-link"
-								style="line-height: 12px; padding-bottom: 16px;">.</a></li>
-							<li class="page-item" th:if="${totalPages}"><a
-								th:href="@{/runapp(size=2, page=${pageNumber})}" th:text=${totalPages} class="page-link">
-							</a></li>
-						</ul>
-					</nav>
 				</div>
 			</div>
 		</div>

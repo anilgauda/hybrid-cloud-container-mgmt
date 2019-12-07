@@ -1,17 +1,37 @@
 package ie.ncirl.container.manager.app.service;
 
-import ie.ncirl.container.manager.app.converters.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ie.ncirl.container.manager.app.converters.DeployerLibAdapter;
+import ie.ncirl.container.manager.app.converters.ModelAppConvertor;
+import ie.ncirl.container.manager.app.converters.ModelVMConvertor;
+import ie.ncirl.container.manager.app.converters.OptimalContainerConvertor;
+import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
+import ie.ncirl.container.manager.app.converters.VMConverter;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.repository.ContainerDeploymentRepo;
 import ie.ncirl.container.manager.app.util.CryptUtil;
 import ie.ncirl.container.manager.app.util.KeyUtils;
+import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.DeploymentVo;
 import ie.ncirl.container.manager.app.vo.OptimizationVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
+import ie.ncirl.container.manager.common.domain.Logs;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.common.domain.enums.AppDeployStrategy;
 import ie.ncirl.container.manager.common.domain.enums.DeploymentType;
+import ie.ncirl.container.manager.common.domain.logging.ApplicationLogs;
+import ie.ncirl.container.manager.common.domain.logging.ContainerLogs;
+import ie.ncirl.container.manager.common.domain.logging.Log;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import ie.ncirl.container.manager.library.configurevm.model.Container;
@@ -29,17 +49,6 @@ import ie.ncirl.container.manager.library.deployer.service.allocator.SpreadAlloc
 import ie.ncirl.container.manager.library.deployer.service.optimizer.Optimizer;
 import ie.ncirl.container.manager.library.deployer.service.optimizer.ZigZagOptimizer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This class monitors all dockers in a given VM and returns required metrics
@@ -82,6 +91,12 @@ public class ContainerDeploymentService {
 
     @Autowired
     private DeployerLibAdapter deployerLibAdapter;
+    
+    @Autowired
+    private LogsService logservice;
+    
+    @Autowired
+    private UserUtil userUtil;
 
     /**
      * Get the docker applications running in a VM
@@ -142,11 +157,13 @@ public class ContainerDeploymentService {
         List<String> containerIds = new ArrayList<>();
         containerIds.add(containerId);
         containerRepo.deleteByContainerId(containerId);
+        createLog(containerRepo.findByContainerId(containerId),"Delete");
     }
 
 
     private void saveContainers(ContainerDeployment containerDeployment) {
         containerRepo.save(containerDeployment);
+        createLog(containerDeployment,"Create");
     }
 
     void deleteContainersByContainerId(Long appId) {
@@ -162,8 +179,11 @@ public class ContainerDeploymentService {
             } catch (ContainerException e) {
                 log.debug("Failed to Stop containers");
             }
+            createLog(containerRepo.findByContainerId(container.getContainerId()),"Delete");
+
         }
         containerRepo.deleteByApplicationId(appId);
+
     }
 
     public List<ContainerDeployment> getContainersByAppId(Long appId) {
@@ -293,8 +313,9 @@ public class ContainerDeploymentService {
         saveContainers(containerDeployment);
 
     }
-
-    public Page<ContainerDeployment> getContainersByAppId(Long id, Pageable pageable) {
-        return containerRepo.findAllByApplicationId(id, pageable);
-    }
+	public void createLog(ContainerDeployment container, String operation) {
+		Log appLog = new ContainerLogs();
+		Logs log = Logs.builder().details(appLog.createLogData(container, operation, userUtil.getCurrentUser().getUsername(), userUtil.getCurrentUserRole())).build();
+		logservice.saveLogs(log);
+	}
 }

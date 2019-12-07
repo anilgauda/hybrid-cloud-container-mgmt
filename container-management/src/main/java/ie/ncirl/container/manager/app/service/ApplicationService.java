@@ -6,28 +6,26 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
-import ie.ncirl.container.manager.app.dto.PageData;
 import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
 import ie.ncirl.container.manager.app.exception.ApplicationException;
 import ie.ncirl.container.manager.app.repository.ApplicationRepo;
 import ie.ncirl.container.manager.app.util.CryptUtil;
 import ie.ncirl.container.manager.app.util.KeyUtils;
-import ie.ncirl.container.manager.app.util.PageUtil;
 import ie.ncirl.container.manager.app.util.UserUtil;
 import ie.ncirl.container.manager.app.vo.ApplicationVo;
 import ie.ncirl.container.manager.app.vo.ContainerVo;
-import ie.ncirl.container.manager.app.vo.PageApplicationVo;
 import ie.ncirl.container.manager.common.domain.Application;
 import ie.ncirl.container.manager.common.domain.ContainerDeployment;
+import ie.ncirl.container.manager.common.domain.Logs;
 import ie.ncirl.container.manager.common.domain.Provider;
 import ie.ncirl.container.manager.common.domain.User;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.common.domain.enums.Role;
+import ie.ncirl.container.manager.common.domain.logging.ApplicationLogs;
+import ie.ncirl.container.manager.common.domain.logging.Log;
 import ie.ncirl.container.manager.library.configurevm.ContainerConfig;
 import ie.ncirl.container.manager.library.configurevm.exception.ContainerException;
 import lombok.extern.slf4j.Slf4j;
@@ -66,18 +64,20 @@ public class ApplicationService {
 	@Autowired
 	private CryptUtil cryptUtil;
 
+	@Autowired
+	private LogsService logService;
+
 	/**
 	 * Gets the all the running applications from application tables and fetch there
 	 * stats from running virtual machine.
 	 *
 	 * @return the running application
 	 */
-	public PageApplicationVo getRunningApplication(int currentPage,int pageSize) {
-		PageApplicationVo pageAppVo=new PageApplicationVo();
+	public List<ApplicationVo> getRunningApplication() {
 		ContainerConfig config = new ContainerConfig();
 		List<ApplicationVo> applications = new ArrayList<>();
-		Page<ContainerDeployment> containers = null;
-				/** Get all the running container from application repo **/
+		List<ContainerDeployment> containers = null;
+		/** Get all the running container from application repo **/
 		List<Application> listofApplication;
 		if (userUtil.getCurrentUserRole().contains(Role.USER.name())) {
 			listofApplication = applicationRepo.findAll();
@@ -86,8 +86,8 @@ public class ApplicationService {
 
 		}
 		for (Application application : listofApplication) {
-			containers = containerService.getContainersByAppId(application.getId(),PageRequest.of(currentPage - 1, pageSize));
-			if (containers.hasContent()) {
+			containers = containerService.getContainersByAppId(application.getId());
+			if (containers.size() > 0) {
 				/** Create applicationvo to display it on page **/
 				ApplicationVo applicationVo = new ApplicationVo();
 				List<ContainerVo> containersVo = new ArrayList<>();
@@ -101,9 +101,7 @@ public class ApplicationService {
 					containerVo.setVmName(vm.getName());
 					containerVo.setProviderName(provider.getName());
 					try {
-						containerVo.setStats(config.getContainerStats(KeyUtils.inBytes(
-								cryptUtil.decryptBytes(vm.getPrivateKey())), vm.getUsername(),
-								vm.getHost(), container.getContainerId()));
+						containerVo.setStats(config.getContainerStats(KeyUtils.inBytes(cryptUtil.decryptBytes(vm.getPrivateKey())), vm.getUsername(), vm.getHost(), container.getContainerId()));
 					} catch (ContainerException e) {
 						logger.error("Error Occured While fetching container stats");
 					}
@@ -113,13 +111,8 @@ public class ApplicationService {
 				applications.add(applicationVo);
 			}
 
-		} 
-		PageData pageData = PageUtil.getPageData(containers);
-		pageAppVo.setApplicationVo(applications);
-		pageAppVo.setCurrPage(pageData.getCurrPage());
-		pageAppVo.setPageNumbers(pageData.getPageNumbers());
-		pageAppVo.setTotalPages(pageData.getTotalPages());
-		return pageAppVo;
+		}
+		return applications;
 	}
 
 	/**
@@ -131,7 +124,12 @@ public class ApplicationService {
 		Application application = convertor.from(regApplication);
 		User user = userUtil.getCurrentUser();
 		application.setUser(user);
-		 log.debug(application.toString());
+		log.debug(application.toString());
+		if (regApplication.getId() != null) {
+			createLog(application, "Update");
+		} else {
+			createLog(application, "Save");
+		}
 		applicationRepo.save(application);
 	}
 
@@ -192,6 +190,7 @@ public class ApplicationService {
 		} else {
 			throw new ApplicationException("Unable to Delete Application as it is already running");
 		}
+		createLog(convertor.from(getApplicationById(id)), "Delete");
 	}
 
 	/**
@@ -203,5 +202,9 @@ public class ApplicationService {
 		containerService.deleteContainersByContainerId(Id);
 	}
 
-
+	public void createLog(Application application, String operation) {
+		Log appLog = new ApplicationLogs();
+		Logs log = Logs.builder().details(appLog.createLogData(application, operation, userUtil.getCurrentUser().getUsername(), userUtil.getCurrentUserRole())).build();
+		logService.saveLogs(log);
+	}
 }

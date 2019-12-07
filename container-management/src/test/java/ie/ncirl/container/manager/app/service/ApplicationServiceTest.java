@@ -1,15 +1,9 @@
 package ie.ncirl.container.manager.app.service;
 
-import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
-import ie.ncirl.container.manager.app.converters.VMConverter;
-import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
-import ie.ncirl.container.manager.app.dto.VMDTO;
-import ie.ncirl.container.manager.app.repository.*;
-import ie.ncirl.container.manager.app.util.KeyUtils;
-import ie.ncirl.container.manager.app.vo.PageApplicationVo;
-import ie.ncirl.container.manager.common.domain.*;
-import ie.ncirl.container.manager.common.domain.enums.Role;
-import ie.ncirl.container.manager.stubs.VMConfigStub;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,8 +19,24 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import ie.ncirl.container.manager.app.converters.RegisterApplicationConvertor;
+import ie.ncirl.container.manager.app.converters.VMConverter;
+import ie.ncirl.container.manager.app.dto.RegisterApplicationDto;
+import ie.ncirl.container.manager.app.dto.VMDTO;
+import ie.ncirl.container.manager.app.repository.ApplicationRepo;
+import ie.ncirl.container.manager.app.repository.ContainerDeploymentRepo;
+import ie.ncirl.container.manager.app.repository.ProviderRepo;
+import ie.ncirl.container.manager.app.repository.UserRepo;
+import ie.ncirl.container.manager.app.repository.VMRepo;
+import ie.ncirl.container.manager.app.util.KeyUtils;
+import ie.ncirl.container.manager.app.vo.ApplicationVo;
+import ie.ncirl.container.manager.common.domain.Application;
+import ie.ncirl.container.manager.common.domain.ContainerDeployment;
+import ie.ncirl.container.manager.common.domain.Provider;
+import ie.ncirl.container.manager.common.domain.User;
+import ie.ncirl.container.manager.common.domain.VM;
+import ie.ncirl.container.manager.common.domain.enums.Role;
+import ie.ncirl.container.manager.stubs.VMConfigStub;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(value = {"spring.profiles.active=test"})
@@ -105,7 +115,7 @@ public class ApplicationServiceTest {
     @Test
     @WithMockUser(username = "user", authorities = {"USER"})
     public void testGetRunningApp() {
-        PageApplicationVo applications = applicationService.getRunningApplication(1, 2);
+    	List<ApplicationVo> applications = applicationService.getRunningApplication();
         Assert.assertNotNull("List of applications fetched failed ", applications);
     }
 
