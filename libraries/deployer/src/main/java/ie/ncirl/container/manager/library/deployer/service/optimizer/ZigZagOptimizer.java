@@ -12,7 +12,7 @@ import java.util.Optional;
 
 /**
  * How it works?
- * Consider following four servers with Memory,CPU pairs of docker containers running in each VMData
+ * Consider following four servers with Memory,CPU pairs of docker containers running in each VM
  * Example:
  * AWS 1  -> 400,30 400,70  -- Total: 800, 100
  * AWS 2  -> 300,30 400,60  -- Total: 700, 90
@@ -22,10 +22,10 @@ import java.util.Optional;
  * For sake of simplicity of this example, assume above servers have max memory of 1200 and max cpu of 100.
  *
  * The algorithm makes use of the idea that memory and cpu are separate components so
- * an applicationData with high cpu can go with an applicationData with high memory thus optimizing
- * the VMData. Hence, if we fill a VMData with container having the highest CPU until the CPU used is
+ * an application with high cpu can go with an application with high memory thus optimizing
+ * the VM. Hence, if we fill a VM with container having the highest CPU until the CPU used is
  * greater than memory then fill with highest memory until the memory used is greater than CPU
- * and go on repeating this process until the VMData is completely filled, we will have an optimized VMData.
+ * and go on repeating this process until the VM is completely filled, we will have an optimized VM.
  * We can then run this for all VMs in the list. There are certain edge cases that have been handled
  * in the code and commented below.
  *
@@ -77,9 +77,7 @@ public class ZigZagOptimizer extends OptimizerTemplate {
 
                 int memoryLeft = availableMemory - usedMemory;
                 int cpuLeft = availableCpu - usedCpu;
-                Optional<Container> maybeContainer = getFirstFittingContainer(
-                        containerListToPick, memoryLeft, cpuLeft);
-
+                Optional<Container> maybeContainer = getFirstFittingContainer(containerListToPick, memoryLeft, cpuLeft);
                 if (!maybeContainer.isPresent()) {
                     // == is intentional, we are comparing references not value
                     if (containerListToPick == cpuSortedContainers) {
@@ -87,9 +85,10 @@ public class ZigZagOptimizer extends OptimizerTemplate {
                     } else {
                         forcePickCpuList = true;
                     }
-                    // No more space left in VMData
+                    // No more space left in VM
                     continue;
                 }
+
                 Container container = maybeContainer.get();
                 cpuSortedContainers.remove(container); // can look for improvements since this is O(n)
                 memSortedContainers.remove(container); // maybe use a mark and sweep like algorithm

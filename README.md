@@ -1,71 +1,71 @@
-hybrid-cloud-container-mgmt
+Hybrid Cloud Management System
 ==
+
+The project allows you to create VMs present across different cloud providers or in-house systems.  
+You can then use these VMs to deploy your applications easily. The project has different allocation  
+strategies to deploy containers across VMs. It also has optimization and deployment algorithms to
+efficiently  use and optimize your existing VMs
+
 
 # Project Structure
 
-## Root project
+The project is split into two main components: 
+## 1. Root project
 The main project is present in `container-management` directory. The main project depends on two libraries
-which are present in a different directories with their own build.gradle
+which are present in different directories with their own build.gradle  
 
-## Libraries
+## 2. Libraries
 The libraries are present separately in two different gradle projects under the `libraries` directory
 These libraries can be built independently of the main project thus making it possible to be used in 
 any other project by publishing them to the maven repository.
 
 
-# Encryption (DRAFT??)
+# External Frameworks/Libraries used
 
-All private key files are stored in home directory defined in application.proprties
-These files are encrypted using AES encryption with the secret key(password) which is not
-stored in the server. Every time an user makes a deployment he will be asked for the password
-which will be used to decrypt the stored private keys.
+ - Spring with Spring boot 
+ - Hibernate with JPA
+ - Lombok
+ - Thymeleaf
+ - JSCH
+ - Google GSON
+ - Flyway
+ - JUnit with Mockito
 
-In case an attacker hacks into the server, he will still not have access to the secret key hence
-the attack can be delayed until any kind of brute force attack takes place.
-
-# How to add SB Admin pages
-
-SB admin is loading all its assets using webjars, so you can fill all absolute paths to the assets by searching
-for sb-admin in https://www.webjars.org/
-
-All html pages are loaded using thymeleaf template engine and are present in resources/templates directory.
- -> To add a new page
- 1. Download the sb admin zip file from https://startbootstrap.com/themes/sb-admin-2/
- 2. Copy paste the html file which you require in templates directory. 
- 3. Replace all css, js and img paths in that html file with webjars path.
- 4. Add a new controller method for the view
- 5. Configure Spring security for this new path in WebSecurityConfig [OPTIONAL]
-
-TODO
-
- - Add container_id in container_deployments er diagram
- - Add extra fields from VM.java
+# Security features
  
+ - JSR 303 validations
+ - Custom form validations with Spring validator
+ - HTML5 validations
+ - CSRF protection with spring security
+ - SQL injection protection with JPA / ORM
+ - Role based authorization to resources
+ - Route protection with spring security
+ - Authentication with spring security
+ - Encryption of private keys
+ - Activity logs for forensics
  
- -->> Security features
+ # Design Patterns
+ Following design patterns are used across the project:
+ ## Main project
+ - Observer/Listener pattern for Hibernate events
+ - Converter pattern to convert DTO <-> Model
+
+ ## ConfigureVM library
+ - Singleton pattern for single instance of VM connection
+ - Strategy pattern for selecting deployment strategies
  
-  - JSR 303 validations
-  - Custom form validations
-  - HTML5 validations
-  - CSRF protection with spring security
-  - SQL injection protection with JPA / ORM
-  - Role based authorization to resources
-  - Route protection with spring security
-  - Authentication with spring security
-  - Encryption of private keys
- 
+ ## Deployer library
+ - Strategy pattern for selecting allocation strategies
+ - Template pattern for optimization algorithm
  
 
- 
- # Design Pattern -> Converter Pattern, Strategy Pattern
- 
- 
- # Parallel Computing Problem -> When an deployment is under process another deployment can have
- #  incorrect allocations due to wrong memory fetches from VMs
- 
+ # Future scope
+ - Make algorithms compatible with multi-threading.
+ - Add ability to optimize VMs with different cores.
+ - Improve encryption security
+   
  
  # How to run JUnit tests
- 
   - Create a postgres database
   - Update the database access details in application-test.properties
   - Now run using the gradle task to execute all tests in your test db
