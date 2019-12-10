@@ -24,7 +24,7 @@ import ie.ncirl.container.manager.common.domain.Logs;
 @RunWith(SpringRunner.class)
 @SpringBootTest(value = {"spring.profiles.active=test"})
 @AutoConfigureMockMvc
-@WithMockUser(username = "test", roles = "GUEST")
+@WithMockUser(username = "admin", roles = "USER",authorities="USER")
 public class LogsControllerTest {
 	@Autowired
 	private MockMvc mockMvc;
@@ -42,7 +42,7 @@ public class LogsControllerTest {
 	
 	@Test
 	public void testGetLogs() throws Exception {
-		 this.mockMvc.perform(get("/logs/view").with(user("admin")))
+		 this.mockMvc.perform(get("/logs/view"))
          .andDo(print())
          .andExpect(status().isOk())
          .andExpect(content().string(containsString("Logs")));

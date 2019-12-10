@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(value = {"spring.profiles.active=test"})
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin", roles = "USER")
+@WithMockUser(username = "admin", roles = "USER",authorities="USER")
 public class UserControllerTest {
 
     @Autowired
@@ -59,7 +59,7 @@ public class UserControllerTest {
 
     @Test
     public void showUserList() throws Exception {
-        this.mockMvc.perform(get("/user/list").with(user("admin")))
+        this.mockMvc.perform(get("/user/list"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("List")))
@@ -103,7 +103,7 @@ public class UserControllerTest {
         this.mockMvc.perform(post(String.format("/user/%d/role/%s", user.getId(), Role.GUEST.name()))
                 .with(csrf()))
                 .andDo(print())
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
