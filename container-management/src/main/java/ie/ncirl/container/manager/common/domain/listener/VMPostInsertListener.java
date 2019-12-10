@@ -1,11 +1,12 @@
 package ie.ncirl.container.manager.common.domain.listener;
 
-import ie.ncirl.container.manager.app.service.VMClient;
-import ie.ncirl.container.manager.common.domain.VM;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import ie.ncirl.container.manager.app.service.VMClient;
+import ie.ncirl.container.manager.common.domain.VM;
 
 /**
  * This is Implementation of the Observer pattern.
@@ -17,6 +18,10 @@ import javax.persistence.PostUpdate;
  * the VMPostInsert event occurs, that object's appropriate
  * method is invoked.
  */
+/**
+ * This Class Implements Observer Design Pattern
+ * referring documentation provided by Jboss https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#events
+ * **/
 public class VMPostInsertListener {
 
     @Autowired
@@ -33,4 +38,5 @@ public class VMPostInsertListener {
     public void configureVM(VM vm) {
         vmClient.configureVM(vm);
     }
+
 }

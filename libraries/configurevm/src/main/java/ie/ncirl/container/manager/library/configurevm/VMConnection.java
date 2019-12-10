@@ -13,7 +13,8 @@ import com.jcraft.jsch.Session;
 import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 
 /**
- * The Class VMConnection.
+ * This class Implements JSCH Framework for SSH Connection to Virtual machine
+ * referring Documentation and examples provided by jcraft http://www.jcraft.com/jsch/examples/
  */
 public class VMConnection {
 	
