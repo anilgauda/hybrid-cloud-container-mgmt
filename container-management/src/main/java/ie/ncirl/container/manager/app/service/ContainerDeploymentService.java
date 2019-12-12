@@ -144,10 +144,9 @@ public class ContainerDeploymentService {
      * @param vm          VM
      */
     private void undeployContainer(String containerId, VM vm) {
-        List<String> containerIds = new ArrayList<>();
-        containerIds.add(containerId);
+        ContainerDeployment containerDeployment = containerRepo.findByContainerId(containerId);
         containerRepo.deleteByContainerId(containerId);
-        createLog(containerRepo.findByContainerId(containerId), "Delete");
+        createLog(containerDeployment, "Delete");
     }
 
 
