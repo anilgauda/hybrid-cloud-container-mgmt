@@ -79,7 +79,7 @@ public class ApplicationWeightedStrategy implements WeightedStrategy {
 			}
 
 			if (appVMMapToDeploy.containsKey(imageName)) {
-				Queue<VMModel> deployList = appVMapToUndeploy.get(imageName);
+				Queue<VMModel> deployList = appVMMapToDeploy.get(imageName);
 				deployList.add(deployVM);
 				appVMMapToDeploy.put(imageName, deployList);
 			} else {

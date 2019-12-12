@@ -293,11 +293,9 @@ public class ContainerDeploymentService {
         log.debug("Containers to be Undeployed" + unDeployedContainers.toString());
         for (Container container : deployedContainers) {
             deployContainer(container.getId(), modelAppConvertor.from(container.getApplication()), modelVMConvertor.from(container.getServer()));
-
         }
         for (Container container : unDeployedContainers) {
             undeployContainer(container.getId(), modelVMConvertor.from(container.getServer()));
-
         }
     }
 
