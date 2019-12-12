@@ -107,6 +107,7 @@ public class ApplicationWeightedStrategy implements WeightedStrategy {
 			/** Calculate the Number of server that is to be deployed first **/
 			double numberOfServer = Math.ceil((float) (value.floatValue() * (weightInPercent / 100.0)));
 			logger.log(Level.INFO, String.format(" Number of Servers %s", numberOfServer));
+			ApplicationModel applicationModel = applicationMap.get(key);
 			for (int i = 0; i < numberOfServer; i++) {
 				// Deploy Vms
 				Container deployedContainer=new Container();
@@ -114,7 +115,7 @@ public class ApplicationWeightedStrategy implements WeightedStrategy {
 				VMModel vm = appVMMapToDeploy.get(key).poll();
 				if (vm != null) {
 					try {
-						deployedContainer.setId(containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), key).get(0));
+						deployedContainer.setId(containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), applicationModel.getRegistryImageUrl()).get(0));
 						deployedContainer.setServer(vm);
 						deployedContainer.setApplication(applicationMap.get(key));
 					} catch (Exception e) {
@@ -156,10 +157,11 @@ public class ApplicationWeightedStrategy implements WeightedStrategy {
 				// Deploy Vms
 				Container deployedContainer=new Container();
 				Container unDeployedContainer=new Container();
+				ApplicationModel applicationModel = applicationMap.get(key);
 				VMModel vm = appVMMapToDeploy.get(key).poll();
 				if (vm != null) {
 					try {
-						deployedContainer.setId(containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), key).get(0));
+						deployedContainer.setId(containerConfig.startContainers(vm.getPrivateKey(), vm.getUsername(), vm.getHost(), applicationModel.getRegistryImageUrl()).get(0));
 						deployedContainer.setServer(vm);
 						deployedContainer.setApplication(applicationMap.get(key));
 					} catch (Exception e) {
