@@ -60,7 +60,7 @@ public class ApplicationWeightedStrategy implements WeightedStrategy {
 			ApplicationModel app = container.getApplication();
 			VMModel undeployVM = container.getServer();
 			VMModel deployVM = model.getOptimalVM();
-			String imageName = app.getRegistryImageUrl();
+			String imageName = app.getName();
 
 			if (appNumberMap.containsKey(imageName)) {
 				appNumberMap.put(imageName, appNumberMap.get(imageName) + 1);

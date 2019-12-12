@@ -45,6 +45,7 @@ public class VMWeightedStrategy implements WeightedStrategy {
 			ApplicationModel app = container.getApplication();
 			VMModel deployVM = model.getOptimalVM();
 			String vmName = deployVM.getName();
+			String appName = app.getName();
 
 			if (vmAppMap.containsKey(vmName)) {
 				vmAppMap.put(vmName, vmAppMap.get(vmName) + 1);
@@ -63,24 +64,24 @@ public class VMWeightedStrategy implements WeightedStrategy {
 				appVMMap.put(vmName, deployList);
 			}
 			
-			if (appVMUndeployMap.containsKey(app.getRegistryImageUrl())) {
-				Queue<VMModel> unDeployList = appVMUndeployMap.get(app.getRegistryImageUrl());
+			if (appVMUndeployMap.containsKey(appName)) {
+				Queue<VMModel> unDeployList = appVMUndeployMap.get(appName);
 				unDeployList.add(container.getServer());
-				appVMUndeployMap.put(app.getRegistryImageUrl(), unDeployList);
+				appVMUndeployMap.put(appName, unDeployList);
 			} else {
 				Queue<VMModel> unDeployList = new LinkedList<>();
 				unDeployList.add(container.getServer());
-				appVMUndeployMap.put(app.getRegistryImageUrl(), unDeployList);
+				appVMUndeployMap.put(appName, unDeployList);
 			}
 
-			if (appContainerMap.containsKey(app.getRegistryImageUrl())) {
-				Queue<String> containerIds = appContainerMap.get(app.getRegistryImageUrl());
+			if (appContainerMap.containsKey(appName)) {
+				Queue<String> containerIds = appContainerMap.get(appName);
 				containerIds.add(container.getId());
-				appContainerMap.put(app.getRegistryImageUrl(), containerIds);
+				appContainerMap.put(appName, containerIds);
 			} else {
 				Queue<String> containerIds = new LinkedList<>();
 				containerIds.add(container.getId());
-				appContainerMap.put(app.getRegistryImageUrl(), containerIds);
+				appContainerMap.put(appName, containerIds);
 			}
 		}
 		logger.log(Level.INFO,"Undeploy map");
@@ -105,8 +106,8 @@ public class VMWeightedStrategy implements WeightedStrategy {
 						logger.log(Level.SEVERE, "Error Occured While Starting Container");
 					}
 				}
-				vm=appVMUndeployMap.get(app.getRegistryImageUrl()).poll();
-				String containerId=appContainerMap.get(app.getRegistryImageUrl()).poll();
+				vm=appVMUndeployMap.get(app.getName()).poll();
+				String containerId=appContainerMap.get(app.getName()).poll();
 				if (vm != null) {
 					try {
 						List<String>containerIDs=new ArrayList<>();
@@ -149,8 +150,8 @@ public class VMWeightedStrategy implements WeightedStrategy {
 						logger.log(Level.SEVERE, "Error Occured While Starting Container");
 					}
 				}
-				vm=appVMUndeployMap.get(app.getRegistryImageUrl()).poll();
-				String containerId=appContainerMap.get(app.getRegistryImageUrl()).poll();
+				vm=appVMUndeployMap.get(app.getName()).poll();
+				String containerId=appContainerMap.get(app.getName()).poll();
 				if (vm != null) {
 					try {
 						List<String>containerIDs=new ArrayList<>();
