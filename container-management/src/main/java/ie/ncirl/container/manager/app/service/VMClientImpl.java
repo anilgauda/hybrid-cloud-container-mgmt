@@ -4,7 +4,6 @@ import ie.ncirl.container.manager.app.util.CryptUtil;
 import ie.ncirl.container.manager.app.util.KeyUtils;
 import ie.ncirl.container.manager.common.domain.VM;
 import ie.ncirl.container.manager.library.configurevm.VMConfig;
-import ie.ncirl.container.manager.library.configurevm.constants.VMConstants;
 import ie.ncirl.container.manager.library.configurevm.exception.DockerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,11 @@ public class VMClientImpl implements VMClient {
     @Autowired
     CryptUtil cryptUtil;
 
+    private static final String VM_STAT_FREE_MEMORY = "free";
+    private static final String VM_STAT_CACHE_MEMORY = "cache";
+    private static final String VM_STAT_BUFF_MEMORY = "buff";
+
+
     /**
      * Gets the current available memory in a VM
      *
@@ -33,8 +37,10 @@ public class VMClientImpl implements VMClient {
         try {
             Map<String, Integer> stats = config.getVMStats(KeyUtils.inBytes(cryptUtil.decryptBytes(vm.getPrivateKey()))
                     , vm.getUsername(), vm.getHost());
-            Integer memInKb = stats.get(VMConstants.VM_STAT_FREE_MEMORY);
-            return memInKb / 1000;
+            Integer freeMemInKb = stats.get(VMClientImpl.VM_STAT_FREE_MEMORY);
+            Integer cacheMemInKb = stats.get(VMClientImpl.VM_STAT_CACHE_MEMORY);
+            Integer buffMemInKb = stats.get(VMClientImpl.VM_STAT_BUFF_MEMORY);
+            return (freeMemInKb + cacheMemInKb + buffMemInKb) / 1000;
         } catch (DockerException e) {
             log.error(String.format("Unable to fetch VM stats from %s", vm), e);
         }
