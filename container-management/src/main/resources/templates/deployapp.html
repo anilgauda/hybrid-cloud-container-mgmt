@@ -29,8 +29,8 @@
 						<tr th:each="appList: ${regApplication}">
 							<td th:text="${appList.name}"></td>
 							<td th:text="${appList.registryImageUrl}"></td>
-							<td th:text="${appList.cpu}"></td>
 							<td th:text="${appList.memory}"></td>
+							<td th:text="${appList.cpu}"></td>
 							<td>
 								<form class="user" method="post" action="#" th:object="${deploymentVo}"
 									th:action="@{|/deploy/${appList.Id}|}">
